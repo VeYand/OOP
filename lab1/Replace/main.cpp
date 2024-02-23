@@ -16,7 +16,7 @@ Args ParseArgs(int argc, char* argv[])
 {
 	if (argc != 5)
 	{
-		throw std::runtime_error(std::format("Usage: {} <input file> <output file> <search string> <replace string>", argv[0]));
+		throw std::runtime_error(std::format("Invalid arguments count\nUsage: {} <input file> <output file> <search string> <replace string>", argv[0]));
 	}
 
 	Args args;
@@ -52,6 +52,7 @@ std::string ReplaceString(const std::string& subject, const std::string& searchS
 		result.append(replacementString);
 		pos = foundPos + searchString.length();
 	}
+
 	return result;
 }
 
