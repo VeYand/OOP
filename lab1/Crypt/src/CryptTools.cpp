@@ -1,18 +1,17 @@
 #include "../include/CryptTools.h"
 #include <fstream>
 
+const int MIN_CRYPT_KEY = 0;
+const int MAX_CRYPT_KEY = 255;
+
 unsigned char MixBits(unsigned char byte)
 {
 	unsigned char result = 0;
 
-	result |= ((byte >> 5) & 0x01) << 7;
-	result |= ((byte >> 1) & 0x01) << 6;
-	result |= ((byte >> 0) & 0x01) << 5;
-	result |= ((byte >> 7) & 0x01) << 4;
-	result |= ((byte >> 6) & 0x01) << 3;
-	result |= ((byte >> 4) & 0x01) << 2;
-	result |= ((byte >> 3) & 0x01) << 1;
-	result |= ((byte >> 2) & 0x01) << 0;
+	result |= (byte & 0b00000111) << 2;
+	result |= (byte & 0b00011000) << 3;
+	result |= (byte & 0b01100000) >> 5;
+	result |= (byte & 0b10000000) >> 2;
 
 	return result;
 }
@@ -21,14 +20,10 @@ unsigned char UnmixBits(unsigned char byte)
 {
 	unsigned char result = 0;
 
-	result |= ((byte >> 7) & 0x01) << 5;
-	result |= ((byte >> 6) & 0x01) << 1;
-	result |= ((byte >> 5) & 0x01) << 0;
-	result |= ((byte >> 4) & 0x01) << 7;
-	result |= ((byte >> 3) & 0x01) << 6;
-	result |= ((byte >> 2) & 0x01) << 4;
-	result |= ((byte >> 1) & 0x01) << 3;
-	result |= ((byte >> 0) & 0x01) << 2;
+	result |= (byte & 0b00000011) << 5;
+	result |= (byte & 0b00011100) >> 2;
+	result |= (byte & 0b00100000) << 2;
+	result |= (byte & 0b11000000) >> 3;
 
 	return result;
 }
@@ -36,7 +31,7 @@ unsigned char UnmixBits(unsigned char byte)
 void CryptFile(std::ifstream& inputFile, std::ofstream& outputFile, int key)
 {
 	char byte;
-	while (inputFile.get(byte))
+	while (inputFile.read(&byte, sizeof(byte)))
 	{
 		byte = static_cast<char>(byte ^ key);
 		outputFile.put(static_cast<char>(MixBits(byte)));
@@ -51,7 +46,7 @@ void CryptFile(std::ifstream& inputFile, std::ofstream& outputFile, int key)
 void DecryptFile(std::ifstream& inputFile, std::ofstream& outputFile, int key)
 {
 	char byte;
-	while (inputFile.get(byte))
+	while (inputFile.read(&byte, sizeof(byte)))
 	{
 		byte = static_cast<char>(UnmixBits(byte) ^ key);
 		outputFile.put(byte);
@@ -65,7 +60,7 @@ void DecryptFile(std::ifstream& inputFile, std::ofstream& outputFile, int key)
 
 void ValidateCryptKey(int key)
 {
-	if (key < 0 || key > 255)
+	if (key < MIN_CRYPT_KEY || key > MAX_CRYPT_KEY)
 	{
 		throw std::invalid_argument("Invalid crypt key");
 	}
@@ -74,8 +69,8 @@ void ValidateCryptKey(int key)
 void Crypt(const std::string& inputFilePath, const std::string& outputFilePath, int key)
 {
 	ValidateCryptKey(key);
-	std::ifstream inputFile(inputFilePath);
-	std::ofstream outputFile(outputFilePath);
+	std::ifstream inputFile(inputFilePath, std::ios::binary | std::ios::in);
+	std::ofstream outputFile(outputFilePath, std::ios::binary | std::ios::out);
 
 	if (!inputFile.is_open())
 	{
@@ -98,8 +93,8 @@ void Crypt(const std::string& inputFilePath, const std::string& outputFilePath, 
 void Decrypt(const std::string& inputFilePath, const std::string& outputFilePath, int key)
 {
 	ValidateCryptKey(key);
-	std::ifstream inputFile(inputFilePath);
-	std::ofstream outputFile(outputFilePath);
+	std::ifstream inputFile(inputFilePath, std::ios::binary | std::ios::in);
+	std::ofstream outputFile(outputFilePath, std::ios::binary | std::ios::out);
 
 	if (!inputFile.is_open())
 	{

@@ -16,7 +16,7 @@ struct Args
 	int key{};
 };
 
-Mode parseMode(const std::string& modeStr)
+Mode ParseMode(const std::string& modeStr)
 {
 	if (modeStr == "crypt")
 	{
@@ -32,7 +32,7 @@ Mode parseMode(const std::string& modeStr)
 	}
 }
 
-Args parseArgs(int argc, char* argv[])
+Args ParseArgs(int argc, char* argv[])
 {
 	if (argc != 5)
 	{
@@ -41,7 +41,7 @@ Args parseArgs(int argc, char* argv[])
 	}
 
 	Args args;
-	args.mode = parseMode(argv[1]);
+	args.mode = ParseMode(argv[1]);
 	args.inputFileName = argv[2];
 	args.outputFileName = argv[3];
 
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 {
 	try
 	{
-		auto args = parseArgs(argc, argv);
+		auto args = ParseArgs(argc, argv);
 		if (args.mode == Mode::CRYPT)
 		{
 			Crypt(args.inputFileName, args.outputFileName, args.key);

@@ -48,6 +48,13 @@ rem Cannot open exists output file
 %PROGRAM% crypt "data\test2\input.txt" "./Crypt.exe" 20
 if NOT ERRORLEVEL 1 goto err
 
+rem Binary file
+%PROGRAM% crypt Crypt.exe "%TEMP%\crypted" 120
+if ERRORLEVEL 1 goto err
+%PROGRAM% decrypt "%TEMP%\crypted" "%TEMP%\decrypted" 120
+if ERRORLEVEL 1 goto err
+fc.exe "%TEMP%\decrypted" Crypt.exe > nul
+if ERRORLEVEL 1 goto err
 
 echo OK
 exit 0
