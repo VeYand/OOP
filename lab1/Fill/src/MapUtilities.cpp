@@ -9,6 +9,21 @@ const char POINT_SYMBOL = '0';
 const char WALL_SYMBOL = '#';
 const char FILL_SYMBOL = '-';
 
+struct Position
+{
+public:
+	int x;
+	int y;
+};
+
+enum class SymbolCode
+{
+	EMPTY_CELL = 0,
+	POINT = 1,
+	WALL = 2,
+	FILL = 3
+};
+
 std::vector<std::vector<SymbolCode>> ReadMap(const std::string& inputFilePath)
 {
 	std::ifstream inputFile(inputFilePath);
@@ -21,21 +36,12 @@ std::vector<std::vector<SymbolCode>> ReadMap(const std::string& inputFilePath)
 	std::vector<std::vector<SymbolCode>> map;
 	std::string line;
 	int lineIndex = 0;
-	while (std::getline(inputFile, line))
+	while (std::getline(inputFile, line) && lineIndex < MAX_HEIGHT)
 	{
-		if (lineIndex >= MAX_HEIGHT)
-		{
-			break;
-		}
-
 		std::vector<SymbolCode> horizontalVector;
-		for (int i = 0; i < line.length(); ++i)
-		{
-			if (i >= MAX_WIDTH)
-			{
-				break;
-			}
 
+		for (int i = 0; i < line.length() && i < MAX_WIDTH; ++i)
+		{
 			SymbolCode symbolCode = SymbolCode::EMPTY_CELL;
 			if (line[i] == POINT_SYMBOL)
 			{
@@ -83,17 +89,20 @@ void WriteMap(const std::string& outputFilePath, const std::vector<std::vector<S
 			case SymbolCode::FILL:
 				symbol = FILL_SYMBOL;
 				break;
+			case SymbolCode::POINT:
+				symbol = POINT_SYMBOL;
+				break;
 			default:
 				break;
 			}
 			outputFile << symbol;
 		}
 		outputFile << std::endl;
-	}
 
-	if (!outputFile.flush())
-	{
-		throw std::runtime_error("Failed to save data on disk");
+		if (!outputFile.flush())
+		{
+			throw std::runtime_error("Failed to save data on disk");
+		}
 	}
 }
 
@@ -115,21 +124,9 @@ std::vector<Position> GetPointPositions(const std::vector<std::vector<SymbolCode
 	return positions;
 }
 
-bool InVector(const Position& pos, const std::vector<Position>& vec)
-{
-	return std::ranges::any_of(vec, [&](const Position& p) {
-		return p.x == pos.x && p.y == pos.y;
-	});
-}
-
 bool IsEdge(const Position& pos, const std::vector<std::vector<SymbolCode>>& map)
 {
-	if (pos.x < 0 || pos.y < 0 || pos.y >= map.size())
-	{
-		return true;
-	}
-
-	if (pos.x >= map[pos.y].size())
+	if (pos.x < 0 || pos.y < 0 || pos.y >= map.size() || pos.x >= map[pos.y].size())
 	{
 		return true;
 	}
@@ -159,29 +156,28 @@ void FillArea(std::vector<std::vector<SymbolCode>>& map, const Position& point)
 	std::vector<Position> visited;
 	std::queue<Position> pointQueue;
 	pointQueue.push(point);
+	bool isStartPosition = true;
 
 	while (!pointQueue.empty())
 	{
 		auto front = pointQueue.front();
 		pointQueue.pop();
 
-		if (InVector(front, visited))
+		if (!isStartPosition && map[front.y][front.x] != SymbolCode::EMPTY_CELL)
 		{
 			continue;
 		}
 
 		visited.push_back(front);
-		map[front.y][front.x] = SymbolCode::FILL;
+		map[front.y][front.x] = isStartPosition ? SymbolCode::POINT : SymbolCode::FILL;
+		isStartPosition = false;
 
 		for (const auto& dir : fillDirections)
 		{
 			Position nextPos(front.x + dir.x, front.y + dir.y);
 			if (!IsEdge(nextPos, map)
-				&& map[nextPos.y][nextPos.x] != SymbolCode::WALL
-				&& map[nextPos.y][nextPos.x] != SymbolCode::FILL
-				&& !InVector(nextPos, visited))
+				&& map[nextPos.y][nextPos.x] == SymbolCode::EMPTY_CELL)
 			{
-
 				pointQueue.push(nextPos);
 			}
 		}

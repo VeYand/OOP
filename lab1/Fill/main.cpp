@@ -9,7 +9,7 @@ struct Args
 	std::string outputFileName;
 };
 
-Args parseArgs(int argc, char* argv[])
+Args ParseArgs(int argc, char* argv[])
 {
 	if (argc != 3)
 	{
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 {
 	try
 	{
-		auto args = parseArgs(argc, argv);
+		auto args = ParseArgs(argc, argv);
 		FillMap(args.inputFileName, args.outputFileName);
 	}
 	catch (std::exception& e)
