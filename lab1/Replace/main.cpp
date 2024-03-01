@@ -16,7 +16,9 @@ Args ParseArgs(int argc, char* argv[])
 {
 	if (argc != 5)
 	{
-		throw std::runtime_error(std::format("Invalid arguments count\nUsage: {} <input file> <output file> <search string> <replace string>", argv[0]));
+		throw std::runtime_error(std::format("Invalid arguments count\n"
+							 "Usage: {} <input file> <output file> "
+							 "<search string> <replace string>", argv[0]));
 	}
 
 	Args args;
@@ -48,8 +50,7 @@ std::string ReplaceString(const std::string& subject, const std::string& searchS
 			return result;
 		}
 
-		result.append(subject, pos, foundPos - pos);
-		result.append(replacementString);
+		result.append(subject.substr(pos, foundPos - pos) + replacementString);
 		pos = foundPos + searchString.length();
 	}
 
@@ -63,6 +64,11 @@ void CopyStreamsWithReplacement(std::ifstream& inputFile, std::ofstream& outputF
 	while (std::getline(inputFile, line))
 	{
 		outputFile << ReplaceString(line, searchString, replacementString) << std::endl;
+
+		if (!outputFile.flush())
+		{
+			throw std::runtime_error("Failed to save data on disk");
+		}
 	}
 
 	if (!inputFile.eof())
@@ -88,11 +94,6 @@ void CopyFilesWithReplacement(const std::string& inputFilePath, const std::strin
 	}
 
 	CopyStreamsWithReplacement(inputFile, outputFile, searchString, replacementString);
-
-	if (!outputFile.flush())
-	{
-		throw std::runtime_error("Failed to save data on disk");
-	}
 }
 
 int main(int argc, char* argv[])
