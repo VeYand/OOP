@@ -5,8 +5,13 @@
 #include <iostream>
 #include <sstream>
 
-std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE> ReadMatrix(const std::string& inputFileName)
+using SquareMatrix2 = std::array<std::array<float, 2>, 2>;
+
+SquareMatrix3 ReadMatrix(const std::string& inputFileName)
 {
+	const int matrixRows = 3;
+	const int matrixCols = 3;
+
 	std::ifstream inputFile(inputFileName);
 
 	if (!inputFile.is_open())
@@ -14,20 +19,20 @@ std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE> ReadMatrix(const std::stri
 		throw std::runtime_error("Cannot open input file");
 	}
 
-	std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE> matrix{};
+	SquareMatrix3 matrix{};
 
 	int row = 0;
 	std::string line;
 	while (std::getline(inputFile, line))
 	{
-		if (row == MATRIX_SIZE)
+		if (row == matrixRows)
 		{
 			break;
 		}
 		std::istringstream iss(line);
-		for (int col = 0; col < MATRIX_SIZE; ++col)
+		for (int col = 0; col < matrixCols; ++col)
 		{
-			int value;
+			float value;
 			if (!(iss >> value))
 			{
 				throw std::runtime_error(std::format("Error reading matrix element at row {}, column {}", std::to_string(row), std::to_string(col)));
@@ -37,7 +42,7 @@ std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE> ReadMatrix(const std::stri
 		++row;
 	}
 
-	if (row < MATRIX_SIZE)
+	if (row < matrixRows)
 	{
 		throw std::runtime_error("Matrix file does not contain 3 rows");
 	}
@@ -50,7 +55,7 @@ std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE> ReadMatrix(const std::stri
 	return matrix;
 }
 
-void PrintMatrix(const std::array<std::array<float, MATRIX_SIZE>, MATRIX_SIZE>& matrix)
+void PrintMatrix(const SquareMatrix3& matrix)
 {
 	for (const auto& row : matrix)
 	{
@@ -66,32 +71,32 @@ void PrintMatrix(const std::array<std::array<float, MATRIX_SIZE>, MATRIX_SIZE>& 
 	}
 }
 
-int CalculateDeterminant(const std::array<std::array<int, 2>, 2>& matrix)
+float CalculateDeterminant(const SquareMatrix2& matrix)
 {
 	return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
 }
 
-int CalculateDeterminant(const std::array<std::array<int, 3>, 3>& matrix)
+float CalculateDeterminant(const SquareMatrix3& matrix)
 {
 	return matrix[0][0] * (matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[2][1])
 		- matrix[0][1] * (matrix[1][0] * matrix[2][2] - matrix[1][2] * matrix[2][0])
 		+ matrix[0][2] * (matrix[1][0] * matrix[2][1] - matrix[1][1] * matrix[2][0]);
 }
 
-std::array<std::array<int, 2>, 2> GetSubMatrix(const std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE>& matrix, int rowToRemove, int colToRemove)
+SquareMatrix2 GetSubMatrix(const SquareMatrix3& matrix, int rowToRemove, int colToRemove)
 {
-	std::array<std::array<int, 2>, 2> subMatrix{};
+	SquareMatrix2 subMatrix{};
 	int subMatrixI = 0;
 	int subMatrixJ = 0;
 
-	for (int m = 0; m < MATRIX_SIZE; ++m)
+	for (int m = 0; m < matrix.size(); ++m)
 	{
 		if (m == rowToRemove)
 		{
 			continue;
 		}
 
-		for (int n = 0; n < MATRIX_SIZE; ++n)
+		for (int n = 0; n < matrix[m].size(); ++n)
 		{
 			if (n == colToRemove)
 			{
@@ -109,32 +114,32 @@ std::array<std::array<int, 2>, 2> GetSubMatrix(const std::array<std::array<int, 
 	return subMatrix;
 }
 
-std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE> GetAlgebraicAdditionsMatrix(const std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE>& matrix)
+SquareMatrix3 GetCofactorMatrix(const SquareMatrix3& matrix)
 {
-	std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE> algebraicAdditionsMatrix{};
+	SquareMatrix3 algebraicAdditionsMatrix{};
 
-	for (int i = 0; i < MATRIX_SIZE; ++i)
+	for (int i = 0; i < matrix.size(); ++i)
 	{
-		for (int j = 0; j < MATRIX_SIZE; ++j)
+		for (int j = 0; j < matrix[i].size(); ++j)
 		{
-			std::array<std::array<int, 2>, 2> subMatrix = GetSubMatrix(matrix, i, j);
+			SquareMatrix2 subMatrix = GetSubMatrix(matrix, i, j);
 			int sign = (i + j) % 2 == 0
 				? 1
 				: -1;
-			algebraicAdditionsMatrix[i][j] = sign * CalculateDeterminant(subMatrix);
+			algebraicAdditionsMatrix[i][j] = static_cast<float>(sign) * CalculateDeterminant(subMatrix);
 		}
 	}
 
 	return algebraicAdditionsMatrix;
 }
 
-std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE> TransposeMatrix(const std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE>& matrix)
+SquareMatrix3 TransposeMatrix(const SquareMatrix3& matrix)
 {
-	std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE> transposedMatrix{};
+	SquareMatrix3 transposedMatrix{};
 
-	for (int col = 0; col < MATRIX_SIZE; ++col)
+	for (int row = 0; row < matrix.size(); ++row)
 	{
-		for (int row = 0; row < MATRIX_SIZE; ++row)
+		for (int col = 0; col < matrix[row].size(); ++col)
 		{
 			transposedMatrix[row][col] = matrix[col][row];
 		}
@@ -143,19 +148,25 @@ std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE> TransposeMatrix(const std:
 	return transposedMatrix;
 }
 
-std::array<std::array<float, MATRIX_SIZE>, MATRIX_SIZE> InvertMatrix(const std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE>& matrix)
+std::optional<SquareMatrix3> InvertMatrix(const SquareMatrix3& matrix)
 {
 	auto determinant = CalculateDeterminant(matrix);
-	auto invertedDet = 1 / static_cast<float>(determinant);
-	auto algebraicAdditionsMatrix = GetAlgebraicAdditionsMatrix(matrix);
-	auto transposedMatrix = TransposeMatrix(algebraicAdditionsMatrix);
-	std::array<std::array<float, MATRIX_SIZE>, MATRIX_SIZE> invertedMatrix{};
 
-	for (int col = 0; col < MATRIX_SIZE; ++col)
+	if (determinant == 0)
 	{
-		for (int row = 0; row < MATRIX_SIZE; ++row)
+		return std::nullopt;
+	}
+
+	auto invertedDet = 1 / static_cast<float>(determinant);
+	auto algebraicAdditionsMatrix = GetCofactorMatrix(matrix);
+	auto transposedMatrix = TransposeMatrix(algebraicAdditionsMatrix);
+	SquareMatrix3 invertedMatrix{};
+
+	for (int row = 0; row < matrix.size(); ++row)
+	{
+		for (int col = 0; col < matrix[row].size(); ++col)
 		{
-			invertedMatrix[row][col] = invertedDet * (float)transposedMatrix[col][row];
+			invertedMatrix[row][col] = invertedDet * static_cast<float>(transposedMatrix[row][col]);
 		}
 	}
 

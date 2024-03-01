@@ -26,7 +26,13 @@ void InvertMatrix(const std::string& matrixFilePath)
 {
 	auto matrix = ReadMatrix(matrixFilePath);
 	auto invertedMatrix = InvertMatrix(matrix);
-	PrintMatrix(invertedMatrix);
+
+	if (!invertedMatrix.has_value()) {
+		std::cout << "The matrix does not have an inverse matrix." << std::endl;
+		return;
+	}
+
+	PrintMatrix(invertedMatrix.value());
 }
 
 int main(int argc, char* argv[])

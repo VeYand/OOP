@@ -28,6 +28,13 @@ rem Invalid data type in input
 %PROGRAM% data/test6/input.txt > "%TEMP%\output.txt"
 if NOT ERRORLEVEL 1 goto err
 
+rem The matrix does not have an inverse matrix
+%PROGRAM% data/test7/input.txt > "%TEMP%\output.txt"
+if ERRORLEVEL 1 goto err
+echo The matrix does not have an inverse matrix.> "%TEMP%\expected.txt"
+fc.exe "%TEMP%\output.txt" "%TEMP%\expected.txt" > nul
+if ERRORLEVEL 1 goto err
+
 echo OK
 exit 0
 
