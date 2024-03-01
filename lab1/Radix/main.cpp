@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <format>
 #include <iostream>
@@ -5,6 +6,9 @@
 
 const int MIN_RADIX = 2;
 const int MAX_RADIX = 36;
+const char NEGATIVE_SYMBOL = '-';
+const char FIRST_CHAR_DIGIT = '0';
+const char FIRST_CHAR_LETTER = 'A';
 
 struct Args
 {
@@ -17,7 +21,9 @@ Args ParseArgs(int argc, char* argv[])
 {
 	if (argc != 4)
 	{
-		throw std::runtime_error(std::format("Invalid arguments count\nUsage: {} <source notation> <destination notation> <value>", argv[0]));
+		throw std::runtime_error(std::format("Invalid arguments count\n"
+											 "Usage: {} <source notation> <destination notation> <value>",
+			argv[0]));
 	}
 
 	Args args;
@@ -51,16 +57,16 @@ int AlphaToInt(const char& alpha, int radix)
 		throw std::invalid_argument(std::format("Radix out of range [{}, {}]", MIN_RADIX, MAX_RADIX));
 	}
 
-	if (std::isdigit(alpha) && (alpha < '0' + radix))
+	if (std::isdigit(alpha) && (alpha < FIRST_CHAR_DIGIT + radix))
 	{
-		return alpha - '0';
+		return alpha - FIRST_CHAR_DIGIT;
 	}
 	if (std::isalpha(alpha))
 	{
 		int upperAlpha = std::toupper(alpha);
-		if (upperAlpha < 'A' + radix - 10)
+		if (upperAlpha < FIRST_CHAR_LETTER + radix - 10)
 		{
-			return upperAlpha - 'A' + 10;
+			return upperAlpha - FIRST_CHAR_LETTER + 10;
 		}
 	}
 
@@ -79,32 +85,34 @@ int StringToInt(const std::string& str, int radix)
 		throw std::invalid_argument("Invalid input string");
 	}
 
-	int decimalNumber = 0;
-	int offset = 0;
-	bool isNegative = false;
-
-	if (str[0] == '-')
+	int number = 0;
+	int sign = 1;
+	for (const auto& ch : str)
 	{
-		isNegative = true;
-		offset = 1;
-	}
-
-	for (size_t i = 0; i < str.length() - offset; ++i)
-	{
-		auto alpha = AlphaToInt(str[str.length() - i - 1], radix);
-		if (decimalNumber > (std::numeric_limits<int>::max() - alpha * (int)std::pow(radix, i)))
+		if (ch == NEGATIVE_SYMBOL)
 		{
-			throw std::overflow_error("Overflow during conversion");
+			if (ch != str[0])
+			{
+				throw std::invalid_argument("Invalid input string");
+			}
+
+			sign *= -1;
+			continue;
 		}
-		decimalNumber += alpha * (int)std::pow(radix, i);
+
+		auto alpha = AlphaToInt(ch, radix);
+
+		if (
+			(number * sign) < (std::numeric_limits<int>::min() + alpha) / radix
+			|| sign > 0 && number > (std::numeric_limits<int>::max() - alpha) / radix)
+		{
+			throw std::runtime_error("Invalid max value in integer");
+		}
+
+		number = number * radix + alpha;
 	}
 
-	if (isNegative)
-	{
-		decimalNumber *= -1;
-	}
-
-	return decimalNumber;
+	return number * sign;
 }
 
 char IntToAlpha(int n)
@@ -116,10 +124,10 @@ char IntToAlpha(int n)
 
 	if (n < 10)
 	{
-		return static_cast<char>('0' + n);
+		return static_cast<char>(FIRST_CHAR_DIGIT + n);
 	}
 
-	return static_cast<char>('A' + (n - 10));
+	return static_cast<char>(FIRST_CHAR_LETTER + (n - 10));
 }
 
 std::string IntToString(int n, int radix)
@@ -129,33 +137,23 @@ std::string IntToString(int n, int radix)
 		throw std::invalid_argument(std::format("Radix out of range [{}, {}]", MIN_RADIX, MAX_RADIX));
 	}
 
+	auto isNegative = n < 0;
+
 	std::string result;
-
-	if (n == 0)
-	{
-		return "0";
-	}
-
-	bool isNegative = false;
-	if (n < 0)
-	{
-		isNegative = true;
-		n = -n;
-	}
-
-	while (n > 0)
+	do
 	{
 		int remainder = n % radix;
-		char digit = IntToAlpha(remainder);
-		result.insert(result.begin(), digit);
+		char digit = IntToAlpha(std::abs(remainder));
+		result += digit;
 		n /= radix;
-	}
+	} while (n != 0);
 
 	if (isNegative)
 	{
-		result.insert(result.begin(), '-');
+		result += NEGATIVE_SYMBOL;
 	}
 
+	std::reverse(result.begin(), result.end());
 	return result;
 }
 
@@ -173,7 +171,7 @@ int main(int argc, char* argv[])
 		auto args = ParseArgs(argc, argv);
 		std::cout << ChangeRadix(args.sourceNotation, args.destinationNotation, args.value) << std::endl;
 	}
-	catch (std::exception& e)
+	catch (const std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
 		return 1;
