@@ -1,0 +1,56 @@
+Задание 6
+Вариант 1 – Expand Template - 100 баллов
+Разработайте функцию
+
+std::string ExpandTemplate(std::string const& tpl, std::map<std::string, std::string> const& params)
+возвращающую результат подстановки параметров, заданных при помощи аргумента params (шаблонный параметр=>значение) в строку tpl. Пустые строки, выступающие в роли ключа в params, должны игнорироваться. Любой шаблонный параметр может встречаться в строке tpl произвольное количество раз. При наличии нескольких возможных вариантов подстановки должен выбираться параметр, имеющий наибольшую длину. Та часть строки tpl, в которую уже была выполнена подстановка, не должна повторно модифицироваться.
+
+Для тестирования функции ExpandTemplate должны быть разработаны тесты, проверяющие корректность их работы на некотором разумном наборе входных параметров.
+
+Пример использования данной функции и ожидаемые результаты ее работы (приведенный пример проверяет лишь некоторые наиболее сложные из возможных ситуаций. Вместо обычных макросов assert следует использовать один из популярных C++-фреймворков для написания тестов):
+
+using namespace std;
+
+int main()
+{
+    {
+        string const tpl = "Hello, %USER_NAME%. Today is {WEEK_DAY}.";
+        map<string, string> params;
+        params["%USER_NAME%"] = "Ivan Petrov";
+        params["{WEEK_DAY}"] = "Friday";
+        assert(ExpandTemplate(tpl, params) == "Hello, Ivan Petrov. Today is Friday.");
+    }
+
+    {
+        string const tpl = "Hello, %USER_NAME%. Today is {WEEK_DAY}.";
+        map<string, string> params;
+        params["%USER_NAME%"] = "Super %USER_NAME% {WEEK_DAY}";
+        params["{WEEK_DAY}"] = "Friday. {WEEK_DAY}";
+        assert(ExpandTemplate(tpl, params) == 
+            "Hello, Super %USER_NAME% {WEEK_DAY}. Today is Friday. {WEEK_DAY}.");
+    }
+
+    {
+        string const tpl = "-AABBCCCCCABC+";
+        map<string, string> params;
+        params["A"] = "[a]";
+        params["AA"] = "[aa]";
+        params["B"] = "[b]";
+        params["BB"] = "[bb]";
+        params["C"] = "[c]";
+        params["CC"] = "[cc]";
+        assert(ExpandTemplate(tpl, params) == 
+            "-[aa][bb][cc][cc][c][a][b][c]+");
+    }
+}
+С использованием данной функции разработайте приложение expand_template, позволяющее заменить вхождения определенных строк в одном файле на определяемые пользователем и записать результат в выходной файл. Синтаксис командной строки приложения:
+
+expand_template.exe <input-file> <output-file> [<param> <value> [<param> <value> …]]
+Пример использования:
+
+expand_template.exe input.txt output.txt "тепло" "холодно" "соленый" "сладкий" "день" "ночь"
+записывает в выходной файл результат замены всех вхождений подстроки «тепло» на «холодно», «соленый» на «сладкий», «день» на «ночь», найденных во входном файле.
+
+Бонус в 150 баллов за эффективное решение данной задачи с использованием алгоритма «Ахо-Корасик»
+
+Рекомендации по выполнению: для эффективной реализации данного задачи ознакомьтесь с алгоритмом «Ахо-Корасик» (Википедия, Хабрахабр)
