@@ -24,7 +24,12 @@ add_executable(${PROJECT_NAME}
 )
 
 add_executable(${PROJECT_NAME}Test
-        test/Test.cpp
+        test/ExpandTemplateTest.cpp
+        src/ExpandTemplate.cpp
+        include/ExpandTemplate.h
+        src/BorTrieUtils.cpp
+        include/BorTrieUtils.h
+        src/BorTrieUtils.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}Test gtest_main)
