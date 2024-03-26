@@ -1,7 +1,20 @@
 #include "../include/Car.h"
 
+const int MIN_SPEED = 0;
+const int MAX_REVERSE_GEAR_SPEED = 20;
+const int MAX_FIRST_GEAR_SPEED = 30;
+const int MIN_SECOND_GEAR_SPEED = 20;
+const int MAX_SECOND_GEAR_SPEED = 50;
+const int MIN_THIRD_GEAR_SPEED = 30;
+const int MAX_THIRD_GEAR_SPEED = 60;
+const int MIN_FOURTH_GEAR_SPEED = 40;
+const int MAX_FOURTH_GEAR_SPEED = 90;
+const int MIN_FIFTH_GEAR_SPEED = 50;
+const int MAX_FIFTH_GEAR_SPEED = 150;
+
 Car::Car()
 	: m_isTurnedOn(false)
+	, m_direction(Direction::STAY)
 	, m_gear(0)
 	, m_speed(0)
 {
@@ -24,6 +37,23 @@ bool Car::TurnOffEngine()
 	return true;
 }
 
+void Car::SetDirection()
+{
+	if (m_speed == 0)
+	{
+		m_direction = Direction::STAY;
+		return;
+	}
+
+	if (m_gear > 0)
+	{
+		m_direction = Direction::FORWARD;
+		return;
+	}
+
+	m_direction = Direction::BACKWARD;
+}
+
 bool Car::SetGear(int gear)
 {
 	if (gear < -1 || gear > 5)
@@ -31,22 +61,23 @@ bool Car::SetGear(int gear)
 		return false;
 	}
 
-	if (gear == 0)
-	{
-		m_gear = 0;
-		return true;
-	}
-
-	if ((m_gear > 0 && gear < 0 || m_gear < 0 && gear > 0) && m_speed != 0)
+	if (m_speed > 0 && (gear > 0 && m_gear < 0 || m_gear > 0 && gear < 0))
 	{
 		return false;
 	}
 
-	if (gear == 1 && (m_speed < 0 || m_speed > 30)
-		|| gear == 2 && (m_speed < 20 || m_speed > 50)
-		|| gear == 3 && (m_speed < 30 || m_speed > 60)
-		|| gear == 4 && (m_speed < 40 || m_speed > 90)
-		|| gear == 5 && (m_speed < 50 || m_speed > 150))
+	if (gear < 0 && m_direction == Direction::FORWARD
+		|| gear > 0 && m_direction == Direction::BACKWARD)
+	{
+		return false;
+	}
+
+	if (gear == -1 && (m_speed < MIN_SPEED || m_speed > MAX_REVERSE_GEAR_SPEED)
+		|| gear == 1 && (m_speed < MIN_SPEED || m_speed > MAX_FIRST_GEAR_SPEED)
+		|| gear == 2 && (m_speed < MIN_SECOND_GEAR_SPEED || m_speed > MAX_SECOND_GEAR_SPEED)
+		|| gear == 3 && (m_speed < MIN_THIRD_GEAR_SPEED || m_speed > MAX_THIRD_GEAR_SPEED)
+		|| gear == 4 && (m_speed < MIN_FOURTH_GEAR_SPEED || m_speed > MAX_FOURTH_GEAR_SPEED)
+		|| gear == 5 && (m_speed < MIN_FIFTH_GEAR_SPEED || m_speed > MAX_FIFTH_GEAR_SPEED))
 	{
 		return false;
 	}
@@ -62,22 +93,23 @@ bool Car::SetSpeed(int speed)
 		return false;
 	}
 
-	if (speed < 0 || speed > 150)
+	if (m_gear == 0 && speed > m_speed)
 	{
 		return false;
 	}
 
-	if (m_gear == -1 && speed > 20
-		|| m_gear == 1 && speed > 30
-		|| m_gear == 2 && (speed < 20 || speed > 50)
-		|| m_gear == 3 && (speed < 30 || speed > 60)
-		|| m_gear == 4 && (speed < 40 || speed > 90)
-		|| m_gear == 5 && speed < 50)
+	if (m_gear == -1 && (speed < MIN_SPEED || speed > MAX_REVERSE_GEAR_SPEED)
+		|| m_gear == 1 && (speed < MIN_SPEED || speed > MAX_FIRST_GEAR_SPEED)
+		|| m_gear == 2 && (speed < MIN_SECOND_GEAR_SPEED || speed > MAX_SECOND_GEAR_SPEED)
+		|| m_gear == 3 && (speed < MIN_THIRD_GEAR_SPEED || speed > MAX_THIRD_GEAR_SPEED)
+		|| m_gear == 4 && (speed < MIN_FOURTH_GEAR_SPEED || speed > MAX_FOURTH_GEAR_SPEED)
+		|| m_gear == 5 && (speed < MIN_FIFTH_GEAR_SPEED || speed > MAX_FIFTH_GEAR_SPEED))
 	{
 		return false;
 	}
 
 	m_speed = speed;
+	SetDirection();
 	return true;
 }
 
@@ -88,15 +120,7 @@ bool Car::IsTurnedOn() const
 
 Direction Car::GetDirection() const
 {
-	if (m_speed == 0)
-	{
-		return Direction::STAY;
-	}
-	if (m_gear == -1)
-	{
-		return Direction::BACKWARD;
-	}
-	return Direction::FORWARD;
+	return m_direction;
 }
 
 int Car::GetSpeed() const

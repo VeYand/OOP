@@ -23,6 +23,8 @@ public:
 	[[nodiscard]] int GetGear() const;
 
 private:
+	void SetDirection();
+	Direction m_direction;
 	bool m_isTurnedOn;
 	int m_gear;
 	int m_speed;
