@@ -3,18 +3,19 @@
 
 #include <optional>
 #include <string>
+#include <cmath>
 
 class Variable
 {
 public:
-	Variable(std::string identifier, std::optional<double> value = std::nullopt);
-	std::string GetIdentifier();
-	std::optional<double> GetValue();
+	explicit Variable(std::string identifier, double value = NAN);
+	[[nodiscard]] std::string GetIdentifier() const;
+	[[nodiscard]] double GetValue() const;
 	void SetValue(double value);
 
 private:
 	std::string m_identifier;
-	std::optional<double> m_value = std::nullopt;
+	double m_value = NAN;
 };
 
 #endif // CALCULATOR_SRC_VARIABLE_H

@@ -15,10 +15,10 @@ public:
 		IDENTITY
 	};
 	Function(std::string functionIdentifier, Operation operation, std::string firstIdentifier, std::string secondIdentifier = "");
-	std::string GetName();
-	Operation GetOperation();
-	std::string GetFirstIdentifier();
-	std::string GetSecondIdentifier();
+	[[nodiscard]] std::string GetName() const;
+	[[nodiscard]] Operation GetOperation() const;
+	[[nodiscard]] std::string GetFirstIdentifier() const;
+	[[nodiscard]] std::string GetSecondIdentifier() const;
 
 private:
 	std::string m_identifier;

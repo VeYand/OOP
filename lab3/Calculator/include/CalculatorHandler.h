@@ -13,8 +13,8 @@ private:
 	void HandleLetCommand(const std::string& commandLine);
 	void HandleFnCommand(const std::string& commandLine);
 	void HandlePrintCommand(const std::string& commandLine);
-	void HandlePrintVarsCommand(const std::string& commandLine);
-	void HandlePrintFunctionsCommand(const std::string& commandLine);
+	void HandlePrintVarsCommand();
+	void HandlePrintFunctionsCommand();
 	static void PrintCalculatorInfo();
 	Calculator m_calculator;
 };

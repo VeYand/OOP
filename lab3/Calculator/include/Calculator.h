@@ -16,13 +16,14 @@ public:
 	void InitVariable(const std::string& identifier, double value);
 	void InitVariable(const std::string& identifier, const std::string& identifierToInstall);
 	void CreateFunction(const std::string& funcIdentifier, const std::string& varIdentifier);
-	void CreateFunction(const std::string& funcIdentifier, Function::Operation operation, const std::string& firstIdentifier, const std::string& secondIdentifier);
-	std::optional<double> CalculateValue(const std::string& identifier);
-	std::map<std::string, std::optional<double>> GetVars();
-	std::map<std::string, std::optional<double>> GetFuncs();
+	void CreateFunction(const std::string& funcIdentifier, Function::Operation operation,
+		const std::string& firstIdentifier, const std::string& secondIdentifier);
+	[[nodiscard]] double CalculateValue(const std::string& identifier) const;
+	[[nodiscard]] std::map<std::string, double> GetVars() const;
+	[[nodiscard]] std::map<std::string, double> GetFuncs() const;
 
 private:
-	std::optional<double> CalculateFunctionValue(const std::string& identifier);
+	[[nodiscard]] double CalculateFunctionValue(const std::string& identifier) const;
 	VariableMap m_variableMap;
 	FunctionMap m_functionMap;
 };

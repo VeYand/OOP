@@ -10,22 +10,22 @@ Function::Function(std::string functionIdentifier, Function::Operation operation
 {
 }
 
-std::string Function::GetName()
+std::string Function::GetName() const
 {
 	return m_identifier;
 }
 
-Function::Operation Function::GetOperation()
+Function::Operation Function::GetOperation() const
 {
 	return m_operation;
 }
 
-std::string Function::GetFirstIdentifier()
+std::string Function::GetFirstIdentifier() const
 {
 	return m_firstIdentifier;
 }
 
-std::string Function::GetSecondIdentifier()
+std::string Function::GetSecondIdentifier() const
 {
 	return m_secondIdentifier;
 }

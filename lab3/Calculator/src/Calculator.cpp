@@ -3,13 +3,12 @@
 
 void Calculator::DeclareVariable(const std::string& identifier)
 {
-	if (m_functionMap.find(identifier) != m_functionMap.end()
-		|| m_variableMap.find(identifier) != m_variableMap.end())
+	if (m_functionMap.contains(identifier) || m_variableMap.contains(identifier))
 	{
-		throw std::invalid_argument("Variable already exists");
+		throw std::invalid_argument("Identifier already exists");
 	}
 
-	m_variableMap[identifier] = std::make_unique<Variable>(identifier, std::nullopt);
+	m_variableMap[identifier] = std::make_unique<Variable>(identifier, NAN);
 }
 
 void Calculator::InitVariable(const std::string& identifier, double value)
@@ -25,7 +24,8 @@ void Calculator::InitVariable(const std::string& identifier, double value)
 	variable->second->SetValue(value);
 }
 
-void Calculator::InitVariable(const std::string& identifier, const std::string& identifierToInstall)
+void Calculator::InitVariable(const std::string& identifier,
+	const std::string& identifierToInstall)
 {
 	if (identifier == identifierToInstall)
 	{
@@ -36,26 +36,38 @@ void Calculator::InitVariable(const std::string& identifier, const std::string& 
 
 	if (m_functionMap.find(identifier) != m_functionMap.end())
 	{
-		m_variableMap[identifier] = std::make_unique<Variable>(identifier, CalculateFunctionValue(function->first));
+		m_variableMap[identifier] = std::make_unique<Variable>(identifier,
+			CalculateFunctionValue(function->first));
 		return;
 	}
 
-	auto variable = m_variableMap.find(identifier);
 	auto value = CalculateValue(identifierToInstall);
 	m_variableMap[identifier] = std::make_unique<Variable>(identifier, value);
 }
 
 void Calculator::CreateFunction(const std::string& funcIdentifier, const std::string& varIdentifier)
 {
-	m_functionMap[funcIdentifier] = std::make_unique<Function>(funcIdentifier, Function::Operation::IDENTITY, varIdentifier);
+	if (m_functionMap.contains(funcIdentifier) || m_variableMap.contains(funcIdentifier))
+	{
+		throw std::invalid_argument("Identifier already exists");
+	}
+
+	m_functionMap[funcIdentifier] = std::make_unique<Function>(funcIdentifier,
+		Function::Operation::IDENTITY, varIdentifier);
 }
 
 void Calculator::CreateFunction(const std::string& funcIdentifier, Function::Operation operation, const std::string& firstIdentifier, const std::string& secondIdentifier)
 {
-	m_functionMap[funcIdentifier] = std::make_unique<Function>(funcIdentifier, operation, firstIdentifier, secondIdentifier);
+	if (m_functionMap.contains(funcIdentifier) || m_variableMap.contains(funcIdentifier))
+	{
+		throw std::invalid_argument("Identifier already exists");
+	}
+
+	m_functionMap[funcIdentifier] = std::make_unique<Function>(
+		funcIdentifier, operation, firstIdentifier, secondIdentifier);
 }
 
-std::optional<double> Calculator::CalculateValue(const std::string& identifier)
+double Calculator::CalculateValue(const std::string& identifier) const
 {
 	auto variable = m_variableMap.find(identifier);
 
@@ -74,7 +86,7 @@ std::optional<double> Calculator::CalculateValue(const std::string& identifier)
 	throw std::invalid_argument(std::format("Identifier `{}` not exists", identifier));
 }
 
-std::optional<double> Calculator::CalculateFunctionValue(const std::string& identifier)
+double Calculator::CalculateFunctionValue(const std::string& identifier) const
 {
 	auto function = m_functionMap.find(identifier);
 
@@ -93,41 +105,37 @@ std::optional<double> Calculator::CalculateFunctionValue(const std::string& iden
 		return CalculateValue(firstIdentifier);
 	}
 
-	std::optional<double> result;
-	std::optional<double> firstValue;
-	std::optional<double> secondValue;
-
-	firstValue = CalculateValue(firstIdentifier);
-	if (!firstValue.has_value())
+	auto firstValue = CalculateValue(firstIdentifier);
+	if (std::isnan(firstValue))
 	{
-		return std::nullopt;
+		return NAN;
 	}
-	secondValue = CalculateValue(secondIdentifier);
-	if (!secondValue.has_value())
+	auto secondValue = CalculateValue(secondIdentifier);
+	if (std::isnan(secondValue))
 	{
-		return std::nullopt;
+		return NAN;
 	}
 
 	switch (operation)
 	{
 	case Function::MULTIPLICATION:
-		return firstValue.value() * secondValue.value();
+		return firstValue * secondValue;
 	case Function::DIVISION:
-		return firstValue.value() / secondValue.value();
+		return firstValue / secondValue;
 	case Function::ADDITION:
-		return firstValue.value() + secondValue.value();
+		return firstValue + secondValue;
 	case Function::SUBTRACTION:
-		return firstValue.value() - secondValue.value();
+		return firstValue - secondValue;
 	default:
 		break;
 	}
 
-	return std::nullopt;
+	return NAN;
 }
 
-std::map<std::string, std::optional<double>> Calculator::GetVars()
+std::map<std::string, double> Calculator::GetVars() const
 {
-	std::map<std::string, std::optional<double>> varValues;
+	std::map<std::string, double> varValues;
 	for (const auto& variable : m_variableMap)
 	{
 		varValues[variable.first] = variable.second->GetValue();
@@ -135,9 +143,9 @@ std::map<std::string, std::optional<double>> Calculator::GetVars()
 	return varValues;
 }
 
-std::map<std::string, std::optional<double>> Calculator::GetFuncs()
+std::map<std::string, double> Calculator::GetFuncs() const
 {
-	std::map<std::string, std::optional<double>> funcValues;
+	std::map<std::string, double> funcValues;
 	for (const auto& function : m_functionMap)
 	{
 		funcValues[function.first] = CalculateFunctionValue(function.first);

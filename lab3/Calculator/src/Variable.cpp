@@ -1,18 +1,18 @@
 #include "../include/Variable.h"
 #include <utility>
 
-Variable::Variable(std::string identifier, std::optional<double> value)
+Variable::Variable(std::string identifier, double value)
 	: m_identifier(std::move(identifier))
 	, m_value(value)
 {
 }
 
-std::string Variable::GetIdentifier()
+std::string Variable::GetIdentifier() const
 {
 	return m_identifier;
 }
 
-std::optional<double> Variable::GetValue()
+double Variable::GetValue() const
 {
 	return m_value;
 }
