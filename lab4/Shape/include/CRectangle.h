@@ -7,9 +7,7 @@
 class CRectangle : public ISolidShape
 {
 public:
-	constexpr static const std::string NAME = "rectangle";
 	CRectangle(CPoint leftTop, CPoint rightBottom, uint32_t outlineColor, uint32_t fillColor);
-	CRectangle(const std::string& string);
 	[[nodiscard]] double GetArea() const override;
 	[[nodiscard]] double GetPerimeter() const override;
 	[[nodiscard]] std::string ToString() const override;

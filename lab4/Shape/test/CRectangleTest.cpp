@@ -1,13 +1,12 @@
 #include "../include/CRectangle.h"
-#include <format>
 #include <gtest/gtest.h>
 
 TEST(CRectangleTest, ConstructorFromParametersAndGetters)
 {
-	CPoint leftTop = { 3, 4 };
-	CPoint rightBottom = { 5, 3 };
+	CPoint leftTop(0, 10);
+	CPoint rightBottom(20, 0);
 	uint32_t outlineColor = 0xFF0000;
-	uint32_t fillColor = 0xFF0000;
+	uint32_t fillColor = 0x00FF00;
 
 	CRectangle rectangle(leftTop, rightBottom, outlineColor, fillColor);
 
@@ -15,88 +14,60 @@ TEST(CRectangleTest, ConstructorFromParametersAndGetters)
 	EXPECT_EQ(rectangle.GetLeftTop().y, leftTop.y);
 	EXPECT_EQ(rectangle.GetRightBottom().x, rightBottom.x);
 	EXPECT_EQ(rectangle.GetRightBottom().y, rightBottom.y);
-
 	EXPECT_EQ(rectangle.GetOutlineColor(), outlineColor);
 	EXPECT_EQ(rectangle.GetFillColor(), fillColor);
 }
 
-TEST(CRectangleTest, ConstructorFromStringAndGetters)
+TEST(CRectangleTest, ConstructorFromInvalidParameters)
 {
-	CRectangle rectangle("rectangle 3 4 5 3 0xFF0000 0xFF0000");
-
-	EXPECT_EQ(rectangle.GetLeftTop().x, 3);
-	EXPECT_EQ(rectangle.GetLeftTop().y, 4);
-	EXPECT_EQ(rectangle.GetRightBottom().x, 5);
-	EXPECT_EQ(rectangle.GetRightBottom().y, 3);
-
-	EXPECT_EQ(rectangle.GetOutlineColor(), 0xFF0000);
-	EXPECT_EQ(rectangle.GetFillColor(), 0xFF0000);
+	EXPECT_THROW(CRectangle rectangle(CPoint(20, 0), CPoint(0, 10), 0xFF0000, 0x00FF00), std::invalid_argument);
 }
 
-TEST(CRectangleTest, ConstructorFromInvalidStringInvalidParameterCount)
-{
-	EXPECT_THROW(CRectangle("rectangle 3 4 5 3 0xFF0000"), std::invalid_argument);
-}
 
-TEST(CRectangleTest, ConstructorFromInvalidStringInvalidName)
+TEST(CRectangleTest, GetArea)
 {
-	EXPECT_THROW(CRectangle("shape 3 4 5 3 0xFF0000 0xFF0000"), std::invalid_argument);
-}
-
-TEST(CRectangleTest, ConstructorFromInvalidParametersInvalidCoordinates)
-{
-	EXPECT_THROW(CRectangle({ 3, 4 }, { 3, 3 }, 0xFF0000, 0xFF0000), std::invalid_argument);
-	EXPECT_THROW(CRectangle({ 3, 4 }, { 2, 3 }, 0xFF0000, 0xFF0000), std::invalid_argument);
-	EXPECT_THROW(CRectangle({ 3, 4 }, { 5, 4 }, 0xFF0000, 0xFF0000), std::invalid_argument);
-	EXPECT_THROW(CRectangle({ 3, 4 }, { 3, 5 }, 0xFF0000, 0xFF0000), std::invalid_argument);
-	EXPECT_THROW(CRectangle({ -1, 4 }, { 0, 3 }, 0xFF0000, 0xFF0000), std::invalid_argument);
-	EXPECT_THROW(CRectangle({ 1, -1 }, { 2, -3 }, 0xFF0000, 0xFF0000), std::invalid_argument);
-	EXPECT_THROW(CRectangle({ -3, 4 }, { -1, 3 }, 0xFF0000, 0xFF0000), std::invalid_argument);
-	EXPECT_THROW(CRectangle({ 2, 4 }, { 0, -1 }, 0xFF0000, 0xFF0000), std::invalid_argument);
-}
-
-TEST(CRectangleTest, ConstructorFromInvalidStringInvalidCoordinates)
-{
-	EXPECT_THROW(CRectangle("rectangle 3 4 3 3 0xFF0000 0xFF0000"), std::invalid_argument);
-	EXPECT_THROW(CRectangle("rectangle 3 4 2 3 0xFF0000 0xFF0000"), std::invalid_argument);
-	EXPECT_THROW(CRectangle("rectangle 3 4 5 4 0xFF0000 0xFF0000"), std::invalid_argument);
-	EXPECT_THROW(CRectangle("rectangle 3 4 3 5 0xFF0000 0xFF0000"), std::invalid_argument);
-	EXPECT_THROW(CRectangle("rectangle -1 4 0 3 0xFF0000 0xFF0000"), std::invalid_argument);
-	EXPECT_THROW(CRectangle("rectangle 1 -1 2 -3 0xFF0000 0xFF0000"), std::invalid_argument);
-	EXPECT_THROW(CRectangle("rectangle -3 4 -1 3 0xFF0000 0xFF0000"), std::invalid_argument);
-	EXPECT_THROW(CRectangle("rectangle 2 4 0 -1 0xFF0000 0xFF0000"), std::invalid_argument);
-}
-
-TEST(CRectangleTest, ConstructorFromInvalidStringInvalidOutlineColor)
-{
-	EXPECT_THROW(CRectangle("rectangle 3 4 4 3 invalid invalid"), std::invalid_argument);
-}
-
-TEST(CRectangleTest, AreaAndPerimeter)
-{
-	CPoint leftTop = { 3, 4 };
-	CPoint rightBottom = { 5, 3 };
+	CPoint leftTop(0, 10);
+	CPoint rightBottom(20, 0);
 	uint32_t outlineColor = 0xFF0000;
-	uint32_t fillColor = 0xFF0000;
+	uint32_t fillColor = 0x00FF00;
 
 	CRectangle rectangle(leftTop, rightBottom, outlineColor, fillColor);
 
-	EXPECT_DOUBLE_EQ(rectangle.GetArea(), 2.0);
+	EXPECT_DOUBLE_EQ(rectangle.GetArea(), 200);
+}
 
-	EXPECT_DOUBLE_EQ(rectangle.GetPerimeter(), 6.0);
+TEST(CRectangleTest, GetPerimeter)
+{
+	CPoint leftTop(0, 10);
+	CPoint rightBottom(20, 0);
+	uint32_t outlineColor = 0xFF0000;
+	uint32_t fillColor = 0x00FF00;
+
+	CRectangle rectangle(leftTop, rightBottom, outlineColor, fillColor);
+
+	EXPECT_DOUBLE_EQ(rectangle.GetPerimeter(), 60);
 }
 
 TEST(CRectangleTest, ToString)
 {
-	CPoint leftTop = { 3, 4 };
-	CPoint rightBottom = { 5, 3 };
+	CPoint leftTop(0, 10);
+	CPoint rightBottom(20, 0);
 	uint32_t outlineColor = 0xFF0000;
-	uint32_t fillColor = 0xFF0000;
+	uint32_t fillColor = 0x00FF00;
 
 	CRectangle rectangle(leftTop, rightBottom, outlineColor, fillColor);
 
-	std::string expectedString = std::format("{}: LeftTop: ({}, {}) RightBottom: ({}, {}) OutlineColor: {:08x} FillColor: {:08x}",
-		CRectangle::NAME, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, outlineColor, fillColor);
+	std::string expectedString = "CRectangle: LeftTop: (0, 10) RightBottom: (20, 0) OutlineColor: 00ff0000 FillColor: 0000ff00 Area: 200.00 Perimeter: 60.00";
 
 	EXPECT_EQ(rectangle.ToString(), expectedString);
+}
+
+TEST(CRectangleTest, DegenerateRectangle)
+{
+	uint32_t outlineColor = 0xFF0000;
+	uint32_t fillColor = 0x00FF00;
+
+	EXPECT_THROW(CRectangle(CPoint(0, 0), CPoint(0, 0), outlineColor, fillColor), std::invalid_argument);
+	EXPECT_THROW(CRectangle(CPoint(0, 2), CPoint(0, 1), outlineColor, fillColor), std::invalid_argument);
+	EXPECT_THROW(CRectangle(CPoint(0, 2), CPoint(-1, 2), outlineColor, fillColor), std::invalid_argument);
 }

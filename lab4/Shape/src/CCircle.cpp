@@ -1,7 +1,6 @@
 #include "../include/CCircle.h"
 #include <cmath>
 #include <format>
-#include <sstream>
 #include <stdexcept>
 
 CCircle::CCircle(CPoint center, double radius, uint32_t outlineColor, uint32_t fillColor)
@@ -13,41 +12,6 @@ CCircle::CCircle(CPoint center, double radius, uint32_t outlineColor, uint32_t f
 	if (radius <= 0)
 	{
 		throw std::invalid_argument("Invalid radius");
-	}
-
-	if (center.x < 0 || center.y < 0)
-	{
-		throw std::invalid_argument("Invalid center coordinates");
-	}
-}
-
-CCircle::CCircle(const std::string& string)
-{
-	std::istringstream iss(string);
-	std::string shapeName;
-	if (!(iss >> shapeName && shapeName == NAME))
-	{
-		throw std::invalid_argument("Invalid shape name");
-	}
-
-	if (!(iss >> m_center.x >> m_center.y >> m_radius))
-	{
-		throw std::invalid_argument("Invalid circle parameters");
-	}
-
-	if (m_radius <= 0)
-	{
-		throw std::invalid_argument("Invalid radius");
-	}
-
-	if (m_center.x < 0 || m_center.y < 0)
-	{
-		throw std::invalid_argument("Invalid center coordinates");
-	}
-
-	if (!(iss >> std::hex >> m_outlineColor >> m_fillColor))
-	{
-		throw std::invalid_argument("Invalid color values");
 	}
 }
 
@@ -63,7 +27,8 @@ double CCircle::GetPerimeter() const
 
 std::string CCircle::ToString() const
 {
-	return std::format("{}: Center: ({}, {}) Radius: {} OutlineColor: {:08x} FillColor: {:08x}", NAME, m_center.x, m_center.y, m_radius, m_outlineColor, m_fillColor);
+	return std::format("CCircle: Center: ({}, {}) Radius: {} OutlineColor: {:08x} FillColor: {:08x} Area: {:.2f} Perimeter: {:.2f}",
+		m_center.x, m_center.y, m_radius, m_outlineColor, m_fillColor, GetArea(), GetPerimeter());
 }
 
 uint32_t CCircle::GetOutlineColor() const

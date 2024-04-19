@@ -4,18 +4,19 @@
 
 struct Args
 {
-	std::string inputFileName;
+	std::optional<std::string> inputFileName;
 };
 
 Args ParseArgs(int argc, char* argv[])
 {
-	if (argc != 2)
+	std::optional<std::string> inputFileName = std::nullopt;
+
+	if (argc >= 2)
 	{
-		throw std::invalid_argument(
-			std::format("Invalid arguments count\nUsage: {} <input_file_name>", argv[0]));
+		inputFileName = argv[1];
 	}
 
-	return Args(argv[1]);
+	return Args(inputFileName);
 }
 
 int main(int argc, char* argv[])
@@ -26,9 +27,21 @@ int main(int argc, char* argv[])
 	try
 	{
 		args = ParseArgs(argc, argv);
-		shapeService.ReadShapes(args.inputFileName);
+		if (args.inputFileName.has_value())
+		{
+			shapeService.ReadShapes(args.inputFileName.value());
+		}
+		else
+		{
+			shapeService.ReadShapes(std::cin);
+		}
 	}
 	catch (const std::invalid_argument& e)
+	{
+		std::cerr << e.what() << std::endl;
+		return 1;
+	}
+	catch (const std::runtime_error& e)
 	{
 		std::cerr << e.what() << std::endl;
 		return 1;

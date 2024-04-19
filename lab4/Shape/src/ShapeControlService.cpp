@@ -1,31 +1,35 @@
 #include "../include/ShapeControlService.h"
+#include "../include/ShapeFactory.h"
 #include <algorithm>
 #include <format>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
-std::shared_ptr<IShape> ConstructShape(const std::string& shapeName, const std::string& shapeInfo)
+namespace
 {
-	if (shapeName == CLineSegment::NAME)
+const std::string EXIT_COMMAND = "...";
+}
+
+void ShapeControlService::ReadShapes(std::istream& input)
+{
+	std::string line;
+	while (std::getline(input, line))
 	{
-		return std::make_shared<CLineSegment>(shapeInfo);
-	}
-	else if (shapeName == CCircle::NAME)
-	{
-		return std::make_shared<CCircle>(shapeInfo);
-	}
-	else if (shapeName == CTriangle::NAME)
-	{
-		return std::make_shared<CTriangle>(shapeInfo);
-	}
-	else if (shapeName == CRectangle::NAME)
-	{
-		return std::make_shared<CRectangle>(shapeInfo);
-	}
-	else
-	{
-		throw std::invalid_argument(std::format("Unknown shape name \"{}\"", shapeName));
+		if (line == EXIT_COMMAND)
+		{
+			break;
+		}
+
+		try
+		{
+			m_shapes.emplace_back(ShapeFactory::constructShape(line));
+		}
+		catch (const std::invalid_argument& e)
+		{
+			std::cout << e.what() << std::endl;
+			continue;
+		}
 	}
 }
 
@@ -37,25 +41,9 @@ void ShapeControlService::ReadShapes(const std::string& inputFileName)
 		throw std::invalid_argument("Error reading input file");
 	}
 
-	std::string line;
-	while (std::getline(inputFile, line))
-	{
-		std::istringstream iss(line);
-		std::string shapeName;
-		iss >> shapeName;
+	ReadShapes(inputFile);
 
-		try
-		{
-			m_shapes.emplace_back(ConstructShape(shapeName, line));
-		}
-		catch (const std::invalid_argument& e)
-		{
-			std::cout << e.what() << std::endl;
-			continue;
-		}
-	}
-
-	if (!inputFile.eof())
+	if (!inputFile.bad())
 	{
 		throw std::runtime_error("Error reading input file");
 	}
@@ -63,16 +51,38 @@ void ShapeControlService::ReadShapes(const std::string& inputFileName)
 
 void ShapeControlService::PrintShapeWithMaxAreaInfo() const
 {
-	auto maxPerimeterShape = *std::max_element(m_shapes.begin(), m_shapes.end(),
-		[](const auto& a, const auto& b) { return a->GetArea() < b->GetArea(); });
+	auto maxAreaShape = std::max_element(
+		m_shapes.begin(),
+		m_shapes.end(),
+		[](const auto& a, const auto& b) {
+			return a->GetArea() < b->GetArea();
+		});
 
-	std::cout << "Shape with maximum area: " << maxPerimeterShape->ToString() << std::endl;
+	if (maxAreaShape == m_shapes.end())
+	{
+		std::cout << "Empty shape list" << std::endl;
+		return;
+	}
+
+	std::cout << "Shape with maximum area: "
+			  << (*maxAreaShape)->ToString() << std::endl;
 }
 
 void ShapeControlService::PrintShapeWithMinPerimeterInfo() const
 {
-	auto minPerimeterShape = *std::min_element(m_shapes.begin(), m_shapes.end(),
-		[](const auto& a, const auto& b) { return a->GetPerimeter() < b->GetPerimeter(); });
+	auto minPerimeterShape = std::min_element(
+		m_shapes.begin(),
+		m_shapes.end(),
+		[](const auto& a, const auto& b) {
+			return a->GetPerimeter() < b->GetPerimeter();
+		});
 
-	std::cout << "Shape with minimum perimeter: " << minPerimeterShape->ToString() << std::endl;
+	if (minPerimeterShape == m_shapes.end())
+	{
+		std::cout << "Empty shape list" << std::endl;
+		return;
+	}
+
+	std::cout << "Shape with minimum perimeter: "
+			  << (*minPerimeterShape)->ToString() << std::endl;
 }

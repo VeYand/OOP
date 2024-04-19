@@ -7,9 +7,7 @@
 class CTriangle : public ISolidShape
 {
 public:
-	constexpr static const std::string NAME = "triangle";
 	CTriangle(CPoint vertex1, CPoint vertex2, CPoint vertex3, uint32_t outlineColor, uint32_t fillColor);
-	CTriangle(const std::string& string);
 	[[nodiscard]] double GetArea() const override;
 	[[nodiscard]] double GetPerimeter() const override;
 	[[nodiscard]] std::string ToString() const override;

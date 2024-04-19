@@ -11,6 +11,8 @@ public:
 	[[nodiscard]] virtual double GetPerimeter() const = 0;
 	[[nodiscard]] virtual std::string ToString() const = 0;
 	[[nodiscard]] virtual uint32_t GetOutlineColor() const = 0;
+
+	virtual ~IShape() = default;
 };
 
 #endif // SHAPE_INCLUDE_I_SHAPE_H

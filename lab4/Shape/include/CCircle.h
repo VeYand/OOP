@@ -7,9 +7,7 @@
 class CCircle : public ISolidShape
 {
 public:
-	constexpr static const std::string NAME = "circle";
 	CCircle(CPoint center, double radius, uint32_t outlineColor, uint32_t fillColor);
-	CCircle(const std::string& string);
 	[[nodiscard]] double GetArea() const override;
 	[[nodiscard]] double GetPerimeter() const override;
 	[[nodiscard]] std::string ToString() const override;

@@ -30,15 +30,12 @@ add_executable(${PROJECT_NAME}
         include/ShapeControlService.h
         src/ShapeControlService.cpp
         src/ShapeControlService.cpp
-        test/main.cpp
-        test/CRectangleTest.cpp
-        test/CTriangleTest.cpp
-        test/CCircleTest.cpp
+        src/ShapeFactory.cpp
+        include/ShapeFactory.h
 )
 
 add_executable(${PROJECT_NAME}Test
         test/main.cpp
-        test/ShapeControlServiceTest.cpp
         test/CRectangleTest.cpp
         test/CTriangleTest.cpp
         test/CCircleTest.cpp
@@ -54,9 +51,10 @@ add_executable(${PROJECT_NAME}Test
         src/CTriangle.cpp
         src/CRectangle.cpp
         src/CCircle.cpp
-        include/ShapeControlService.h
-        src/ShapeControlService.cpp
-        src/ShapeControlService.cpp
+        src/ShapeFactory.cpp
+        include/ShapeFactory.h
+        src/ShapeFactory.cpp
+        test/ShapeFactoryTest.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}Test gtest_main)

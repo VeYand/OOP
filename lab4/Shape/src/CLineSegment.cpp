@@ -9,36 +9,10 @@ CLineSegment::CLineSegment(CPoint startPoint, CPoint endPoint, uint32_t outlineC
 	, m_endPoint(endPoint)
 	, m_outlineColor(outlineColor)
 {
-	if (startPoint.x < 0
-		|| startPoint.y < 0
-		|| endPoint.x < 0
-		|| endPoint.y < 0)
+	if (startPoint.x == endPoint.x
+		&& startPoint.y == endPoint.y)
 	{
 		throw std::invalid_argument("Invalid line coordinates");
-	}
-}
-
-CLineSegment::CLineSegment(const std::string& string)
-{
-	std::istringstream iss(string);
-	std::string shapeName;
-	if (!(iss >> shapeName && shapeName == NAME))
-	{
-		throw std::invalid_argument("Invalid shape name");
-	}
-
-	if (!(iss >> m_startPoint.x >> m_startPoint.y >> m_endPoint.x >> m_endPoint.y)
-		|| m_startPoint.x < 0
-		|| m_startPoint.y < 0
-		|| m_endPoint.x < 0
-		|| m_endPoint.y < 0)
-	{
-		throw std::invalid_argument("Invalid line segment coordinates");
-	}
-
-	if (!(iss >> std::hex >> m_outlineColor))
-	{
-		throw std::invalid_argument("Invalid color value");
 	}
 }
 
@@ -49,12 +23,13 @@ double CLineSegment::GetArea() const
 
 double CLineSegment::GetPerimeter() const
 {
-	return 0;
+	return sqrt(pow(m_endPoint.x - m_startPoint.x, 2) + pow(m_endPoint.y - m_startPoint.y, 2));
 }
 
 std::string CLineSegment::ToString() const
 {
-	return std::format("{}: StartPoint: ({}, {}) EndPoint: ({}, {}) OutlineColor: {:08x}", NAME, m_startPoint.x, m_startPoint.y, m_endPoint.x, m_endPoint.y, m_outlineColor);
+	return std::format("CLineSegment: StartPoint: ({}, {}) EndPoint: ({}, {}) OutlineColor: {:08x} Area: {:.2f} Perimeter: {:.2f}",
+		m_startPoint.x, m_startPoint.y, m_endPoint.x, m_endPoint.y, m_outlineColor, GetArea(), GetPerimeter());
 }
 
 uint32_t CLineSegment::GetOutlineColor() const

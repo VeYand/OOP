@@ -11,52 +11,13 @@ CTriangle::CTriangle(CPoint vertex1, CPoint vertex2, CPoint vertex3, uint32_t ou
 	, m_outlineColor(outlineColor)
 	, m_fillColor(fillColor)
 {
-	if (vertex1.x < 0 || vertex1.y < 0
-		|| vertex2.x < 0 || vertex2.y < 0
-		|| vertex3.x < 0 || vertex3.y < 0)
-	{
-		throw std::invalid_argument("Invalid triangle points");
-	}
-
 	double a, b, c;
 	CalculateSideLengths(a, b, c);
 
 	if ((a + b <= c) || (a + c <= b) || (b + c <= a)
-		|| a <= 0 || b <= 0 || c <= 0)
+		|| a < 0 || b < 0 || c < 0)
 	{
 		throw std::invalid_argument("Invalid triangle points");
-	}
-}
-
-CTriangle::CTriangle(const std::string& string)
-{
-	std::istringstream iss(string);
-	std::string shapeName;
-	if (!(iss >> shapeName && shapeName == NAME))
-	{
-		throw std::invalid_argument("Invalid shape name");
-	}
-
-	if (!(iss >> m_vertex1.x >> m_vertex1.y >> m_vertex2.x >> m_vertex2.y >> m_vertex3.x >> m_vertex3.y)
-		|| m_vertex1.x < 0 || m_vertex1.y < 0
-		|| m_vertex2.x < 0 || m_vertex2.y < 0
-		|| m_vertex3.x < 0 || m_vertex3.y < 0)
-	{
-		throw std::invalid_argument("Invalid triangle coordinates");
-	}
-
-	double a, b, c;
-	CalculateSideLengths(a, b, c);
-
-	if ((a + b <= c) || (a + c <= b) || (b + c <= a)
-		|| a <= 0 || b <= 0 || c <= 0)
-	{
-		throw std::invalid_argument("Invalid triangle points");
-	}
-
-	if (!(iss >> std::hex >> m_outlineColor >> m_fillColor))
-	{
-		throw std::invalid_argument("Invalid color values");
 	}
 }
 
@@ -87,7 +48,8 @@ double CTriangle::GetPerimeter() const
 
 std::string CTriangle::ToString() const
 {
-	return std::format("{}: Vertex1: ({}, {}) Vertex2: ({}, {}) Vertex3: ({}, {}) OutlineColor: {:08x} FillColor: {:08x}", NAME, m_vertex1.x, m_vertex1.y, m_vertex2.x, m_vertex2.y, m_vertex3.x, m_vertex3.y, m_outlineColor, m_fillColor);
+	return std::format("CTriangle: Vertex1: ({}, {}) Vertex2: ({}, {}) Vertex3: ({}, {}) OutlineColor: {:08x} FillColor: {:08x} Area: {:.2f} Perimeter: {:.2f}",
+		m_vertex1.x, m_vertex1.y, m_vertex2.x, m_vertex2.y, m_vertex3.x, m_vertex3.y, m_outlineColor, m_fillColor, GetArea(), GetPerimeter());
 }
 
 uint32_t CTriangle::GetOutlineColor() const

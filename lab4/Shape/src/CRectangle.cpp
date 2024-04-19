@@ -10,43 +10,9 @@ CRectangle::CRectangle(CPoint leftTop, CPoint rightBottom, uint32_t outlineColor
 	, m_fillColor(fillColor)
 {
 	if (rightBottom.x <= leftTop.x
-		|| rightBottom.y >= leftTop.y
-		|| rightBottom.x < 0
-		|| rightBottom.y < 0
-		|| leftTop.x < 0
-		|| leftTop.y < 0)
+		|| rightBottom.y >= leftTop.y)
 	{
 		throw std::invalid_argument("Invalid rectangle points");
-	}
-}
-
-CRectangle::CRectangle(const std::string& string)
-{
-	std::istringstream iss(string);
-	std::string shapeName;
-	if (!(iss >> shapeName && shapeName == NAME))
-	{
-		throw std::invalid_argument("Invalid shape name");
-	}
-
-	if (!(iss >> m_leftTop.x >> m_leftTop.y >> m_rightBottom.x >> m_rightBottom.y))
-	{
-		throw std::invalid_argument("Invalid rectangle coordinates");
-	}
-
-	if (m_rightBottom.x <= m_leftTop.x
-		|| m_rightBottom.y >= m_leftTop.y
-		|| m_rightBottom.x < 0
-		|| m_rightBottom.y < 0
-		|| m_leftTop.x < 0
-		|| m_leftTop.y < 0)
-	{
-		throw std::invalid_argument("Invalid rectangle points");
-	}
-
-	if (!(iss >> std::hex >> m_outlineColor >> m_fillColor))
-	{
-		throw std::invalid_argument("Invalid color values");
 	}
 }
 
@@ -62,7 +28,8 @@ double CRectangle::GetPerimeter() const
 
 std::string CRectangle::ToString() const
 {
-	return std::format("{}: LeftTop: ({}, {}) RightBottom: ({}, {}) OutlineColor: {:08x} FillColor: {:08x}", NAME, m_leftTop.x, m_leftTop.y, m_rightBottom.x, m_rightBottom.y, m_outlineColor, m_fillColor);
+	return std::format("CRectangle: LeftTop: ({}, {}) RightBottom: ({}, {}) OutlineColor: {:08x} FillColor: {:08x} Area: {:.2f} Perimeter: {:.2f}",
+		m_leftTop.x, m_leftTop.y, m_rightBottom.x, m_rightBottom.y, m_outlineColor, m_fillColor, GetArea(), GetPerimeter());
 }
 
 uint32_t CRectangle::GetOutlineColor() const
