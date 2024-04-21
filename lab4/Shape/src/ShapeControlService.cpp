@@ -51,6 +51,12 @@ void ShapeControlService::ReadShapes(const std::string& inputFileName)
 
 void ShapeControlService::PrintShapeWithMaxAreaInfo() const
 {
+	if (m_shapes.empty())
+	{
+		std::cout << "Empty shape list" << std::endl;
+		return;
+	}
+
 	auto maxAreaShape = std::max_element(
 		m_shapes.begin(),
 		m_shapes.end(),
@@ -58,18 +64,18 @@ void ShapeControlService::PrintShapeWithMaxAreaInfo() const
 			return a->GetArea() < b->GetArea();
 		});
 
-	if (maxAreaShape == m_shapes.end())
-	{
-		std::cout << "Empty shape list" << std::endl;
-		return;
-	}
-
 	std::cout << "Shape with maximum area: "
 			  << (*maxAreaShape)->ToString() << std::endl;
 }
 
 void ShapeControlService::PrintShapeWithMinPerimeterInfo() const
 {
+	if (m_shapes.empty())
+	{
+		std::cout << "Empty shape list" << std::endl;
+		return;
+	}
+
 	auto minPerimeterShape = std::min_element(
 		m_shapes.begin(),
 		m_shapes.end(),
@@ -77,12 +83,11 @@ void ShapeControlService::PrintShapeWithMinPerimeterInfo() const
 			return a->GetPerimeter() < b->GetPerimeter();
 		});
 
-	if (minPerimeterShape == m_shapes.end())
-	{
-		std::cout << "Empty shape list" << std::endl;
-		return;
-	}
-
 	std::cout << "Shape with minimum perimeter: "
 			  << (*minPerimeterShape)->ToString() << std::endl;
+}
+
+std::vector<std::shared_ptr<IShape>> ShapeControlService::GetShapes() const
+{
+	return m_shapes;
 }
