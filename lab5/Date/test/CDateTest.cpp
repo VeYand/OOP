@@ -43,12 +43,47 @@ TEST(CDateTest, DateConstructorValid)
 
 TEST(CDateTest, DateConstructorInvalidYear)
 {
-	EXPECT_THROW(CDate(1, CDate::Month::APRIL, 1969), std::invalid_argument);
+	EXPECT_THROW(CDate(31, CDate::Month::DECEMBER, 1969), std::underflow_error);
+	EXPECT_NO_THROW(CDate(1, CDate::Month::JANUARY, 1970));
+
+	EXPECT_THROW(CDate(1, CDate::Month::JANUARY, 10000), std::overflow_error);
+	EXPECT_NO_THROW(CDate(31, CDate::Month::DECEMBER, 9999));
+
 }
 
-TEST(CDateTest, DateConstructorInvalidDay)
+TEST(CDateTest, DateDayConstructor)
 {
-	EXPECT_THROW(CDate(30, CDate::Month::FEBRUARY, 1970), std::invalid_argument);
+	EXPECT_THROW(CDate(30, CDate::Month::FEBRUARY, 1970), std::overflow_error);
+	EXPECT_THROW(CDate(29, CDate::Month::FEBRUARY, 1970), std::overflow_error);
+	EXPECT_NO_THROW(CDate(28, CDate::Month::FEBRUARY, 1970));
+
+	EXPECT_THROW(CDate(30, CDate::Month::FEBRUARY, 1972), std::overflow_error);
+	EXPECT_NO_THROW(CDate(29, CDate::Month::FEBRUARY, 1972));
+	EXPECT_NO_THROW(CDate(28, CDate::Month::FEBRUARY, 1972));
+
+	for (auto month : { CDate::Month::JANUARY, CDate::Month::MARCH, CDate::Month::MAY,
+			 CDate::Month::JULY, CDate::Month::AUGUST, CDate::Month::OCTOBER, CDate::Month::DECEMBER })
+	{
+		EXPECT_THROW(CDate(32, month, 1970), std::overflow_error);
+		EXPECT_NO_THROW(CDate(31, month, 1970));
+		EXPECT_NO_THROW(CDate(30, month, 1970));
+
+		EXPECT_THROW(CDate(32, month, 1972), std::overflow_error);
+		EXPECT_NO_THROW(CDate(31, month, 1972));
+		EXPECT_NO_THROW(CDate(30, month, 1972));
+	}
+
+	for (auto month : { CDate::Month::APRIL, CDate::Month::JUNE, CDate::Month::SEPTEMBER, CDate::Month::NOVEMBER })
+	{
+		EXPECT_THROW(CDate(32, month, 1970), std::overflow_error);
+		EXPECT_THROW(CDate(31, month, 1970), std::overflow_error);
+		EXPECT_NO_THROW(CDate(30, month, 1970));
+		EXPECT_NO_THROW(CDate(29, month, 1970));
+
+		EXPECT_THROW(CDate(31, month, 1972), std::overflow_error);
+		EXPECT_NO_THROW(CDate(30, month, 1972));
+		EXPECT_NO_THROW(CDate(29, month, 1972));
+	}
 }
 
 TEST(CDateTest, IncrementDecrementOperators)
@@ -86,14 +121,27 @@ TEST(CDateTest, AdditionSubtractionOperatorsWithNumber)
 	EXPECT_EQ(CDate(31, CDate::Month::DECEMBER, 2023), date);
 }
 
+TEST(CDateTest, InvalidAdditionOperators)
+{
+	auto maxDate = CDate(31, CDate::Month::DECEMBER, 9999);
+
+	EXPECT_THROW(++maxDate, std::overflow_error);
+	EXPECT_THROW(maxDate++, std::overflow_error);
+	EXPECT_THROW(maxDate + 1, std::overflow_error);
+	EXPECT_THROW(maxDate += 1, std::overflow_error);
+}
+
 TEST(CDateTest, InvalidSubtractionOperators)
 {
 	auto date = CDate();
-	EXPECT_THROW(date - 1, std::invalid_argument);
-	EXPECT_THROW(date -= 1, std::invalid_argument);
+
+	EXPECT_THROW(--date, std::underflow_error);
+	EXPECT_THROW(date--, std::underflow_error);
+	EXPECT_THROW(date - 1, std::underflow_error);
+	EXPECT_THROW(date -= 1, std::underflow_error);
 }
 
-TEST(CDateTest, AdditionSubtractionOperatorsWithDate)
+TEST(CDateTest, SubtractionOperatorsWithDate)
 {
 	CDate date1(1, CDate::Month::JANUARY, 2024);
 	CDate date2(10, CDate::Month::JANUARY, 2024);
@@ -134,9 +182,18 @@ TEST(CDateTest, InputOperator)
 	std::istringstream iss("25.12.2022");
 	CDate date;
 	iss >> date;
+	EXPECT_FALSE(iss.bad());
 	EXPECT_EQ(25, date.GetDay());
 	EXPECT_EQ(CDate::Month::DECEMBER, date.GetMonth());
 	EXPECT_EQ(2022, date.GetYear());
+}
+
+TEST(CDateTest, InvalidInputDate)
+{
+	std::istringstream iss("25.2022");
+	CDate date;
+	iss >> date;
+	EXPECT_TRUE(iss.bad());
 }
 
 GTEST_API_ int main(int argc, char** argv)

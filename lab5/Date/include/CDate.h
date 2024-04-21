@@ -45,9 +45,12 @@ public:
 	CDate operator++(int);
 	CDate& operator--();
 	CDate operator--(int);
-	CDate operator+(int days) const;
-	CDate operator-(int days) const;
-	int operator-(const CDate& date2) const;
+
+	friend CDate operator+(const CDate& date, int days);
+	friend CDate operator+(int days, const CDate& date);
+	friend CDate operator-(const CDate& date, int days);
+	friend int operator-(const CDate& date1, const CDate& date2);
+
 	CDate& operator+=(int days);
 	CDate& operator-=(int days);
 
@@ -60,17 +63,20 @@ public:
 	bool operator<=(const CDate& date) const;
 	bool operator>=(const CDate& date) const;
 
+	friend std::ostream& operator<<(std::ostream& os, const CDate& date);
+	friend std::istream& operator>>(std::istream& is, CDate& date);
+
 private:
+	constexpr static const unsigned MAX_TIMESTAMP = 2932896;
 	constexpr static const unsigned DAYS_IN_YEAR = 365;
 	constexpr static const unsigned EPOCH_YEAR = 1970;
+	constexpr static const WeekDay EPOCH_WEEK_DAY = WeekDay::THURSDAY;
 	constexpr static const unsigned DAYS_IN_WEEK = 7;
+	constexpr static const char DATE_DIVIDER = '.';
 	unsigned m_timestamp;
-	static bool IsLeapYear(unsigned year) ;
-	static unsigned DaysInMonth(Month month, unsigned year) ;
+	static bool IsLeapYear(unsigned year);
+	static unsigned DaysInMonth(Month month, unsigned year);
 	static unsigned CalculateDaysSinceEpoch(unsigned day, Month month, unsigned year);
 };
-
-std::ostream& operator<<(std::ostream& os, const CDate& date);
-std::istream& operator>>(std::istream& is, CDate& date);
 
 #endif // DATE_CDATE_H
