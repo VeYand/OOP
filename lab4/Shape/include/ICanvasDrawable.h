@@ -7,7 +7,7 @@
 class ICanvasDrawable
 {
 public:
-	virtual void Draw(std::shared_ptr<ICanvas>& canvas) = 0;
+	virtual void Draw(std::shared_ptr<ICanvas> canvas) = 0;
 };
 
 #endif // SHAPE_INCLUDE_ICANVASDRAWABLE_H

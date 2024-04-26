@@ -2,6 +2,7 @@
 #define SHAPE_INCLUDE_CTRIANGLE_H
 
 #include "CPoint.h"
+#include "ICanvasDrawable.h"
 #include "ISolidShape.h"
 
 class CTriangle : public ISolidShape
@@ -16,6 +17,7 @@ public:
 	[[nodiscard]] CPoint GetVertex1() const;
 	[[nodiscard]] CPoint GetVertex2() const;
 	[[nodiscard]] CPoint GetVertex3() const;
+	void Draw(std::shared_ptr<ICanvas> canvas) override;
 
 private:
 	void CalculateSideLengths(double& a, double& b, double& c) const;

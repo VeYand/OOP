@@ -2,6 +2,7 @@
 #define SHAPE_INCLUDE_CLINESEGMENT_H
 
 #include "CPoint.h"
+#include "ICanvasDrawable.h"
 #include "IShape.h"
 
 class CLineSegment : public IShape
@@ -14,6 +15,7 @@ public:
 	[[nodiscard]] uint32_t GetOutlineColor() const override;
 	[[nodiscard]] CPoint GetStartPoint() const;
 	[[nodiscard]] CPoint GetEndPoint() const;
+	void Draw(std::shared_ptr<ICanvas> canvas) override;
 
 private:
 	CPoint m_startPoint, m_endPoint;

@@ -4,14 +4,15 @@
 #include "CCanvas.h"
 #include "ShapeControlService.h"
 
-class CanvasWindowControlService : public ShapeControlService
+class CanvasWindowControlService
 {
 public:
 	CanvasWindowControlService();
-	void DrawShapes();
+	void DrawShapes(std::istream& input);
 
 private:
-	CCanvas m_canvas;
+	ShapeControlService m_shapeController;
+	std::shared_ptr<CCanvas> m_canvas;
 };
 
 #endif // SHAPE_INCLUDE_CANVASWINDOWCONTROLSERVICE_H

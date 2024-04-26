@@ -1,7 +1,7 @@
+#include "../include/ShapeFactory.h"
 #include <cmath>
 #include <format>
 #include <gtest/gtest.h>
-#include "../include/ShapeFactory.h"
 
 TEST(ShapeFactoryTest, ConstructorFromInvalidStringInvalidName)
 {
@@ -69,7 +69,6 @@ TEST(ShapeFactoryTest, LineSegmentConstructorFromInvalidStringInvalidOutlineColo
 
 	EXPECT_THROW(ShapeFactory::constructShape(lineString), std::invalid_argument);
 }
-
 
 TEST(ShapeFactoryTest, CRectangleConstructor)
 {

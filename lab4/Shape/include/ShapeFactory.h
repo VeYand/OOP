@@ -2,12 +2,14 @@
 #define SHAPE_INCLUDE_SHAPEFACTORY_H
 
 #include "./IShape.h"
+#include "ICanvasDrawable.h"
 #include <memory>
 
 class ShapeFactory
 {
 public:
 	static std::shared_ptr<IShape> constructShape(const std::string& info);
+	static std::shared_ptr<ICanvasDrawable> constructDrawableShape(const std::string& info);
 
 private:
 	constexpr static const std::string CLineSegmentName = "line_segment";

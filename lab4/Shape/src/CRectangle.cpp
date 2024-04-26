@@ -10,7 +10,7 @@ CRectangle::CRectangle(CPoint leftTop, CPoint rightBottom, uint32_t outlineColor
 	, m_fillColor(fillColor)
 {
 	if (rightBottom.x <= leftTop.x
-		|| rightBottom.y >= leftTop.y)
+		|| rightBottom.y <= leftTop.y)
 	{
 		throw std::invalid_argument("Invalid rectangle points");
 	}
@@ -60,4 +60,21 @@ double CRectangle::GetWidth() const
 double CRectangle::GetHeight() const
 {
 	return m_leftTop.y - m_rightBottom.y;
+}
+
+void CRectangle::Draw(std::shared_ptr<ICanvas> canvas)
+{
+	CPoint rightTop(m_rightBottom.x, m_leftTop.y);
+	CPoint leftBottom(m_leftTop.x, m_rightBottom.y);
+
+	canvas->FillPolygon({ m_leftTop,
+							rightTop,
+							m_rightBottom,
+							leftBottom },
+		m_fillColor);
+
+	canvas->DrawLine(m_leftTop, rightTop, m_outlineColor);
+	canvas->DrawLine(rightTop, m_rightBottom, m_outlineColor);
+	canvas->DrawLine(m_rightBottom, leftBottom, m_outlineColor);
+	canvas->DrawLine(leftBottom, m_leftTop, m_outlineColor);
 }

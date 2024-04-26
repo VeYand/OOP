@@ -50,3 +50,9 @@ double CCircle::GetRadius() const
 {
 	return m_radius;
 }
+
+void CCircle::Draw(std::shared_ptr<ICanvas> canvas)
+{
+	canvas->DrawCircle(m_center, m_radius, m_outlineColor);
+	canvas->FillCircle(m_center, m_radius, m_fillColor);
+}

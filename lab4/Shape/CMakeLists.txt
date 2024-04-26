@@ -14,6 +14,14 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(googletest)
 
+FetchContent_Declare(
+        sfml
+        GIT_REPOSITORY https://github.com/SFML/SFML.git
+        GIT_TAG        2.6.x
+)
+
+FetchContent_MakeAvailable(sfml)
+
 add_executable(${PROJECT_NAME}
         main.cpp
         include/CPoint.h
@@ -32,7 +40,20 @@ add_executable(${PROJECT_NAME}
         src/ShapeControlService.cpp
         src/ShapeFactory.cpp
         include/ShapeFactory.h
+        include/ICanvasDrawable.h
+        include/ICanvasDrawable.h
+        include/ICanvas.h
+        include/ICanvas.h
+        src/CCanvas.cpp
+        include/CCanvas.h
+        include/CCanvas.h
+        include/CCanvas.h
+        src/CCanvas.cpp
+        src/CanvasWindowControlService.cpp
+        include/CanvasWindowControlService.h
 )
+
+target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window sfml-system)
 
 add_executable(${PROJECT_NAME}Test
         test/main.cpp
@@ -55,6 +76,7 @@ add_executable(${PROJECT_NAME}Test
         include/ShapeFactory.h
         src/ShapeFactory.cpp
         test/ShapeFactoryTest.cpp
+        include/ICanvasDrawable.h
 )
 
 target_link_libraries(${PROJECT_NAME}Test gtest_main)

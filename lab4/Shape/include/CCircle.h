@@ -2,6 +2,7 @@
 #define SHAPE_INCLUDE_CCIRCLE_H
 
 #include "CPoint.h"
+#include "ICanvasDrawable.h"
 #include "ISolidShape.h"
 
 class CCircle : public ISolidShape
@@ -15,6 +16,7 @@ public:
 	[[nodiscard]] uint32_t GetFillColor() const override;
 	[[nodiscard]] CPoint GetCenter() const;
 	[[nodiscard]] double GetRadius() const;
+	void Draw(std::shared_ptr<ICanvas> canvas) override;
 
 private:
 	CPoint m_center;

@@ -1,5 +1,6 @@
-#include "include/ShapeControlService.h"
+#include "include/CanvasWindowControlService.h"
 #include <format>
+#include <fstream>
 #include <iostream>
 
 struct Args
@@ -22,18 +23,19 @@ Args ParseArgs(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
 	Args args{};
-	ShapeControlService shapeService;
+	CanvasWindowControlService shapeService;
 
 	try
 	{
 		args = ParseArgs(argc, argv);
 		if (args.inputFileName.has_value())
 		{
-			shapeService.ReadShapes(args.inputFileName.value());
+			std::ifstream file(args.inputFileName.value());
+			shapeService.DrawShapes(file);
 		}
 		else
 		{
-			shapeService.ReadShapes(std::cin);
+			shapeService.DrawShapes(std::cin);
 		}
 	}
 	catch (const std::invalid_argument& e)
@@ -46,9 +48,6 @@ int main(int argc, char* argv[])
 		std::cerr << e.what() << std::endl;
 		return 1;
 	}
-
-	shapeService.PrintShapeWithMaxAreaInfo();
-	shapeService.PrintShapeWithMinPerimeterInfo();
 
 	return 0;
 }

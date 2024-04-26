@@ -20,9 +20,8 @@ TEST(CRectangleTest, ConstructorFromParametersAndGetters)
 
 TEST(CRectangleTest, ConstructorFromInvalidParameters)
 {
-	EXPECT_THROW(CRectangle rectangle(CPoint(20, 0), CPoint(0, 10), 0xFF0000, 0x00FF00), std::invalid_argument);
+	EXPECT_THROW(CRectangle rectangle(CPoint(20, 10), CPoint(0, 0), 0xFF0000, 0x00FF00), std::invalid_argument);
 }
-
 
 TEST(CRectangleTest, GetArea)
 {

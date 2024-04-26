@@ -2,6 +2,7 @@
 #define SHAPE_INCLUDE_CRECTANGLE_H
 
 #include "CPoint.h"
+#include "ICanvasDrawable.h"
 #include "ISolidShape.h"
 
 class CRectangle : public ISolidShape
@@ -17,6 +18,7 @@ public:
 	[[nodiscard]] CPoint GetRightBottom() const;
 	[[nodiscard]] double GetWidth() const;
 	[[nodiscard]] double GetHeight() const;
+	void Draw(std::shared_ptr<ICanvas> canvas) override;
 
 private:
 	CPoint m_leftTop, m_rightBottom;

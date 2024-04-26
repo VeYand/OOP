@@ -19,7 +19,6 @@ TEST(CCircleTest, ConstructorFromParametersAndGetters)
 	EXPECT_EQ(circle.GetFillColor(), fillColor);
 }
 
-
 TEST(CCircleTest, ConstructorFromInvalidParameters)
 {
 	EXPECT_THROW(CCircle circle(CPoint(0, 0), -5.0, 0xFF0000, 0x00FF00), std::invalid_argument);

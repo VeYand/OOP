@@ -1,10 +1,11 @@
 #ifndef SHAPE_INCLUDE_I_SHAPE_H
 #define SHAPE_INCLUDE_I_SHAPE_H
 
+#include "./ICanvasDrawable.h"
 #include <cstdint>
 #include <string>
 
-class IShape
+class IShape : public ICanvasDrawable
 {
 public:
 	[[nodiscard]] virtual double GetArea() const = 0;

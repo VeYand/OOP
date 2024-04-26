@@ -144,3 +144,31 @@ std::shared_ptr<IShape> ShapeFactory::constructShape(const std::string& info)
 		throw std::invalid_argument(std::format("Unknown shape name \"{}\"", shapeName));
 	}
 }
+
+std::shared_ptr<ICanvasDrawable> ShapeFactory::constructDrawableShape(const std::string& info)
+{
+	std::istringstream iss(info);
+	std::string shapeName;
+	iss >> shapeName;
+
+	if (shapeName == CLineSegmentName)
+	{
+		return constructCLineSegment(info);
+	}
+	else if (shapeName == CCircleName)
+	{
+		return constructCCircle(info);
+	}
+	else if (shapeName == CTriangleName)
+	{
+		return constructCTriangle(info);
+	}
+	else if (shapeName == CRectangleName)
+	{
+		return constructCRectangle(info);
+	}
+	else
+	{
+		throw std::invalid_argument(std::format("Unknown shape name \"{}\"", shapeName));
+	}
+}
