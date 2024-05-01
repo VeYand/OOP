@@ -59,7 +59,7 @@ double CRectangle::GetWidth() const
 
 double CRectangle::GetHeight() const
 {
-	return m_leftTop.y - m_rightBottom.y;
+	return m_rightBottom.y - m_leftTop.y;
 }
 
 void CRectangle::Draw(std::shared_ptr<ICanvas> canvas)

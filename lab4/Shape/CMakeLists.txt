@@ -72,14 +72,25 @@ add_executable(${PROJECT_NAME}Test
         src/CTriangle.cpp
         src/CRectangle.cpp
         src/CCircle.cpp
+        include/ShapeControlService.h
+        src/ShapeControlService.cpp
+        src/ShapeControlService.cpp
         src/ShapeFactory.cpp
         include/ShapeFactory.h
-        src/ShapeFactory.cpp
-        test/ShapeFactoryTest.cpp
         include/ICanvasDrawable.h
+        include/ICanvasDrawable.h
+        include/ICanvas.h
+        include/ICanvas.h
+        src/CCanvas.cpp
+        include/CCanvas.h
+        include/CCanvas.h
+        include/CCanvas.h
+        src/CCanvas.cpp
+        src/CanvasWindowControlService.cpp
+        include/CanvasWindowControlService.h
 )
 
-target_link_libraries(${PROJECT_NAME}Test gtest_main)
+target_link_libraries(${PROJECT_NAME}Test gtest_main sfml-graphics sfml-window sfml-system)
 enable_testing()
 add_test(NAME ${PROJECT_NAME}Test COMMAND ${PROJECT_NAME}Test)
 

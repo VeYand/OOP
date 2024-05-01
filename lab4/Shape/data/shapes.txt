@@ -1,6 +1,18 @@
-circle 250 500 100 0x145913 0x40b53e
-rectangle 330 300 370 400 0x827710 0xada136
+rectangle 0 0 800 500 0x99D9EAFF 0x99D9EAFF
+rectangle 0 380 800 500 0x22B14CFF 0xB5E61DFF
+circle 45 45 35 0xFF7F27FF 0xFFF200FF
+line_segment 85 45 115 45 0xFF0000FF
+line_segment 75 75 100 100 0xFF0000FF
+line_segment 45 85 45 115 0xFF0000FF
 
+rectangle 200 200 600 380 0x7F7F7FFF 0xEFE4B0FF
+triangle 200 200 400 100 600 200 0x7F7F7FFF 0xEFE4B0FF
+circle 400 155 30 0x7F7F7FFF 0xEFE4B0FF
+
+rectangle 350 260 450 320 0x7F7F7FFF 0x009ADCFF
+line_segment 350 290 450 290 0x7F7F7FFF
+line_segment 400 260 400 320 0x7F7F7FFF
+...
 
 rectangle <leftTopX> <leftTopY> <rightBottomX> <rightBottomY> outlineColor(uint_32t) fillColor(uint_32t)
 circle <centerX> <centerY> <radius> outlineColor(uint_32t) fillColor(uint_32t)

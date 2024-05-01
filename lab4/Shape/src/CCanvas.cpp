@@ -18,7 +18,10 @@ void CCanvas::FillPolygon(std::vector<CPoint> points, uint32_t fillColor)
 	if (points.empty())
 		return;
 
-	sf::VertexArray polygon(sf::PrimitiveType::Quads, points.size());
+	sf::VertexArray polygon = points.size() == 3
+		? sf::VertexArray(sf::PrimitiveType::Triangles, points.size())
+		: sf::VertexArray(sf::PrimitiveType::Quads, points.size());
+
 	for (size_t i = 0; i < points.size(); ++i)
 	{
 		polygon[i].position = sf::Vector2f(points[i].x, points[i].y);
@@ -31,7 +34,7 @@ void CCanvas::FillPolygon(std::vector<CPoint> points, uint32_t fillColor)
 void CCanvas::DrawCircle(CPoint center, double radius, uint32_t lineColor)
 {
 	sf::CircleShape circle(radius);
-	circle.setPosition(center.x, center.y);
+	circle.setPosition(center.x - radius, center.y - radius);
 	circle.setFillColor(sf::Color::Transparent);
 	circle.setOutlineColor(sf::Color(lineColor));
 	circle.setOutlineThickness(2);
@@ -42,7 +45,7 @@ void CCanvas::DrawCircle(CPoint center, double radius, uint32_t lineColor)
 void CCanvas::FillCircle(CPoint center, double radius, uint32_t fillColor)
 {
 	sf::CircleShape circle(radius);
-	circle.setPosition(center.x, center.y);
+	circle.setPosition(center.x - radius, center.y - radius);
 	circle.setFillColor(sf::Color(fillColor));
 	circle.setOutlineColor(sf::Color::Transparent);
 

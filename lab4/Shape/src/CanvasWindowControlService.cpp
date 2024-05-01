@@ -8,7 +8,7 @@ void CanvasWindowControlService::DrawShapes(std::istream& input)
 	m_shapeController.ReadShapes(input);
 	auto shapes = m_shapeController.GetShapes();
 
-	auto window = std::make_shared<sf::RenderWindow>(sf::VideoMode(800, 600), "My window");
+	auto window = std::make_shared<sf::RenderWindow>(sf::VideoMode(800, 500), "My window");
 	m_canvas = std::make_shared<CCanvas>(window);
 
 	while (window->isOpen())
