@@ -1,6 +1,8 @@
-#include "CMyString.h"
+#include "../include/CMyString.h"
 #include <cstring>
 #include <stdexcept>
+
+char CMyString::EMPTY_STRING[1] = { '\0' };
 
 CMyString::CMyString(const char* pString, size_t length)
 	: m_length(length)
@@ -11,7 +13,7 @@ CMyString::CMyString(const char* pString, size_t length)
 }
 
 CMyString::CMyString()
-	: CMyString(new char, 0)
+	: CMyString(EMPTY_STRING, 0)
 {
 }
 
@@ -29,7 +31,7 @@ CMyString::CMyString(CMyString&& other) noexcept
 	: m_pData(other.m_pData)
 	, m_length(other.m_length)
 {
-	other.m_pData = nullptr;
+	other.m_pData = EMPTY_STRING;
 	other.m_length = 0;
 }
 
@@ -40,7 +42,10 @@ CMyString::CMyString(const std::string& stlString)
 
 CMyString::~CMyString()
 {
-	delete[] m_pData;
+	if (m_pData != EMPTY_STRING)
+	{
+		delete[] m_pData;
+	}
 }
 
 size_t CMyString::GetLength() const
@@ -94,7 +99,7 @@ CMyString& CMyString::operator=(CMyString&& other) noexcept
 	{
 		delete[] m_pData;
 		m_length = 0;
-		m_pData = nullptr;
+		m_pData = EMPTY_STRING;
 
 		std::swap(m_pData, other.m_pData);
 		std::swap(m_length, other.m_length);

@@ -16,13 +16,13 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(${PROJECT_NAME}
         main.cpp
-        include/CMyString.cpp
+        src/CMyString.cpp
         include/CMyString.h
 )
 
 add_executable(${PROJECT_NAME}Test
         test/CMyStringTest.cpp
-        include/CMyString.cpp
+        src/CMyString.cpp
         include/CMyString.h
 )
 

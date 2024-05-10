@@ -43,6 +43,7 @@ private:
 	constexpr static const char END_OF_STRING = '\0';
 	constexpr static const char END_OF_LINE = '\n';
 	constexpr static const char INPUT_STRING_SEPARATOR = ' ';
+	static char EMPTY_STRING[1];
 	size_t m_length;
 	char* m_pData;
 };

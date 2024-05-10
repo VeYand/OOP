@@ -44,7 +44,7 @@ TEST(CMyString, MoveConstructor)
 	EXPECT_EQ(moved.GetLength(), 11);
 	EXPECT_STREQ(moved.GetStringData(), "Test String");
 	EXPECT_EQ(original.GetLength(), 0);
-	EXPECT_EQ(original.GetStringData(), nullptr);
+	EXPECT_STREQ(original.GetStringData(), "");
 }
 
 TEST(CMyString, ConstructorFromStdString)
@@ -139,7 +139,7 @@ TEST(CMyString, MoveOperation)
 	EXPECT_EQ(moved.GetLength(), 11);
 	EXPECT_STREQ(moved.GetStringData(), "Test String");
 	EXPECT_EQ(original.GetLength(), 0);
-	EXPECT_EQ(original.GetStringData(), nullptr);
+	EXPECT_STREQ(original.GetStringData(), "");
 }
 
 TEST(CMyString, OperatorPlusEqualsEmptyString)
