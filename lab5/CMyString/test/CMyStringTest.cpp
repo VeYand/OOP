@@ -6,6 +6,7 @@ TEST(CMyString, DefaultConstructor)
 	CMyString str;
 	EXPECT_EQ(str.GetLength(), 0);
 	EXPECT_STREQ(str.GetStringData(), "");
+	EXPECT_EQ(str.GetCapacity(), 1);
 }
 
 TEST(CMyString, ConstructorFromString)
@@ -14,6 +15,7 @@ TEST(CMyString, ConstructorFromString)
 	CMyString str(testData);
 	EXPECT_EQ(str.GetLength(), 11);
 	EXPECT_STREQ(str.GetStringData(), "Test String");
+	EXPECT_GE(str.GetCapacity(), 12);
 }
 
 TEST(CMyString, ConstructorFromStringWithLength)
@@ -23,6 +25,7 @@ TEST(CMyString, ConstructorFromStringWithLength)
 	CMyString str(testData, length);
 	EXPECT_EQ(str.GetLength(), length);
 	EXPECT_STREQ(str.GetStringData(), "Test");
+	EXPECT_GE(str.GetCapacity(), length + 1);
 }
 
 TEST(CMyString, CopyConstructor)
@@ -34,6 +37,7 @@ TEST(CMyString, CopyConstructor)
 	EXPECT_EQ(copy.GetLength(), 11);
 	EXPECT_STREQ(copy.GetStringData(), original.GetStringData());
 	EXPECT_STREQ(copy.GetStringData(), "Test String");
+	EXPECT_GE(copy.GetCapacity(), 12);
 }
 
 TEST(CMyString, MoveConstructor)
@@ -43,8 +47,10 @@ TEST(CMyString, MoveConstructor)
 	CMyString moved(std::move(original));
 	EXPECT_EQ(moved.GetLength(), 11);
 	EXPECT_STREQ(moved.GetStringData(), "Test String");
+	EXPECT_GE(moved.GetCapacity(), 12);
 	EXPECT_EQ(original.GetLength(), 0);
 	EXPECT_STREQ(original.GetStringData(), "");
+	EXPECT_EQ(original.GetCapacity(), 1);
 }
 
 TEST(CMyString, ConstructorFromStdString)
@@ -53,6 +59,7 @@ TEST(CMyString, ConstructorFromStdString)
 	CMyString str(testData);
 	EXPECT_EQ(str.GetLength(), 11);
 	EXPECT_STREQ(str.GetStringData(), "Test String");
+	EXPECT_GE(str.GetCapacity(), 12);
 }
 
 TEST(CMyString, GetLength)
@@ -69,6 +76,13 @@ TEST(CMyString, GetStringData)
 	EXPECT_STREQ(str.GetStringData(), "Test String");
 }
 
+TEST(CMyString, GetCapacity)
+{
+	const char* testData = "Test String";
+	CMyString str(testData);
+	EXPECT_GE(str.GetCapacity(), 12);
+}
+
 TEST(CMyString, SubString)
 {
 	const char* testData = "Test String";
@@ -76,13 +90,14 @@ TEST(CMyString, SubString)
 	CMyString subStr = str.SubString(5, 6);
 	EXPECT_EQ(subStr.GetLength(), 6);
 	EXPECT_STREQ(subStr.GetStringData(), "String");
+	EXPECT_GE(subStr.GetCapacity(), 7);
 }
 
 TEST(CMyString, SubStringOutOfRange)
 {
 	const char* testData = "Test String";
 	CMyString str(testData);
-	EXPECT_THROW(str.SubString(20), std::out_of_range);
+	EXPECT_THROW(str.SubString(20, 5), std::out_of_range);
 }
 
 TEST(CMyString, ClearEmptyString)
@@ -91,6 +106,7 @@ TEST(CMyString, ClearEmptyString)
 	str.Clear();
 	EXPECT_EQ(str.GetLength(), 0);
 	EXPECT_STREQ(str.GetStringData(), "");
+	EXPECT_EQ(str.GetCapacity(), 1);
 }
 
 TEST(CMyString, ClearNotEmptyString)
@@ -100,6 +116,7 @@ TEST(CMyString, ClearNotEmptyString)
 	str.Clear();
 	EXPECT_EQ(str.GetLength(), 0);
 	EXPECT_STREQ(str.GetStringData(), "");
+	EXPECT_EQ(str.GetCapacity(), 1);
 }
 
 TEST(CMyString, AssigmentOperation)
@@ -109,13 +126,16 @@ TEST(CMyString, AssigmentOperation)
 		auto newStr = str;
 		EXPECT_EQ(newStr.GetLength(), 11);
 		EXPECT_STREQ(newStr.GetStringData(), "Test String");
+		EXPECT_GE(newStr.GetCapacity(), 12);
 		newStr.Clear();
 		EXPECT_EQ(newStr.GetLength(), 0);
 		EXPECT_STREQ(newStr.GetStringData(), "");
+		EXPECT_EQ(newStr.GetCapacity(), 1);
 	}
 
 	EXPECT_EQ(str.GetLength(), 11);
 	EXPECT_STREQ(str.GetStringData(), "Test String");
+	EXPECT_GE(str.GetCapacity(), 12);
 }
 
 TEST(CMyString, SelfAssigmentOperation)
@@ -126,9 +146,11 @@ TEST(CMyString, SelfAssigmentOperation)
 
 	EXPECT_EQ(str.GetLength(), 11);
 	EXPECT_STREQ(str.GetStringData(), "Test String");
+	EXPECT_GE(str.GetCapacity(), 12);
 	str.Clear();
 	EXPECT_EQ(str.GetLength(), 0);
 	EXPECT_STREQ(str.GetStringData(), "");
+	EXPECT_EQ(str.GetCapacity(), 1);
 }
 
 TEST(CMyString, MoveOperation)
@@ -138,8 +160,10 @@ TEST(CMyString, MoveOperation)
 	CMyString moved = std::move(original);
 	EXPECT_EQ(moved.GetLength(), 11);
 	EXPECT_STREQ(moved.GetStringData(), "Test String");
+	EXPECT_GE(moved.GetCapacity(), 12);
 	EXPECT_EQ(original.GetLength(), 0);
 	EXPECT_STREQ(original.GetStringData(), "");
+	EXPECT_EQ(original.GetCapacity(), 1);
 }
 
 TEST(CMyString, OperatorPlusEqualsEmptyString)
@@ -149,6 +173,7 @@ TEST(CMyString, OperatorPlusEqualsEmptyString)
 	str1 += str2;
 	EXPECT_EQ(str1.GetLength(), 4);
 	EXPECT_STREQ(str1.GetStringData(), "Test");
+	EXPECT_GE(str1.GetCapacity(), 5);
 }
 
 TEST(CMyString, OperatorPlusEqualsNonEmptyString)
@@ -158,6 +183,7 @@ TEST(CMyString, OperatorPlusEqualsNonEmptyString)
 	str1 += str2;
 	EXPECT_EQ(str1.GetLength(), 11);
 	EXPECT_STREQ(str1.GetStringData(), "Hello World");
+	EXPECT_GE(str1.GetCapacity(), 12);
 }
 
 TEST(CMyString, OperatorPlusEqualsSelfAssignment)
@@ -166,6 +192,7 @@ TEST(CMyString, OperatorPlusEqualsSelfAssignment)
 	str += str;
 	EXPECT_EQ(str.GetLength(), 10);
 	EXPECT_STREQ(str.GetStringData(), "HelloHello");
+	EXPECT_GE(str.GetCapacity(), 11);
 }
 
 TEST(CMyString, OperatorPlusEqualsEmptyAssignment)
@@ -175,6 +202,7 @@ TEST(CMyString, OperatorPlusEqualsEmptyAssignment)
 	str += empty;
 	EXPECT_EQ(str.GetLength(), 5);
 	EXPECT_STREQ(str.GetStringData(), "Hello");
+	EXPECT_GE(str.GetCapacity(), 6);
 }
 
 TEST(CMyString, ChainedAssignment)
@@ -183,6 +211,7 @@ TEST(CMyString, ChainedAssignment)
 	str += CMyString(", World") += CMyString("!");
 	EXPECT_EQ(str.GetLength(), 13);
 	EXPECT_STREQ(str.GetStringData(), "Hello, World!");
+	EXPECT_GE(str.GetCapacity(), 14);
 }
 
 TEST(CMyString, OperatorIndexAccessValidIndex)
@@ -215,7 +244,6 @@ TEST(CMyString, OperatorIndexAccessMultipleTimes)
 	EXPECT_EQ(str[5], 'S');
 	EXPECT_EQ(str[10], 'g');
 }
-
 
 TEST(CMyString, OperatorIndexMutableAccessAndModifyValidIndex)
 {
@@ -259,6 +287,7 @@ TEST(CMyString, OperatorPlusCMyStringCMyString)
 	CMyString result = str1 + str2;
 	EXPECT_EQ(result.GetLength(), 11);
 	EXPECT_STREQ(result.GetStringData(), "Hello World");
+	EXPECT_GE(result.GetCapacity(), 12);
 }
 
 TEST(CMyString, OperatorPlusStdStringCMyString)
@@ -268,6 +297,7 @@ TEST(CMyString, OperatorPlusStdStringCMyString)
 	CMyString result = stdStr + str;
 	EXPECT_EQ(result.GetLength(), 11);
 	EXPECT_STREQ(result.GetStringData(), "Hello World");
+	EXPECT_GE(result.GetCapacity(), 12);
 }
 
 TEST(CMyString, OperatorPlusCharPtrCMyString)
@@ -277,6 +307,7 @@ TEST(CMyString, OperatorPlusCharPtrCMyString)
 	CMyString result = charPtr + str;
 	EXPECT_EQ(result.GetLength(), 11);
 	EXPECT_STREQ(result.GetStringData(), "Hello World");
+	EXPECT_GE(result.GetCapacity(), 12);
 }
 
 TEST(CMyString, OperatorPlusCMyStringStdString)
@@ -286,6 +317,7 @@ TEST(CMyString, OperatorPlusCMyStringStdString)
 	CMyString result = str + stdStr;
 	EXPECT_EQ(result.GetLength(), 11);
 	EXPECT_STREQ(result.GetStringData(), "Hello World");
+	EXPECT_GE(result.GetCapacity(), 12);
 }
 
 TEST(CMyString, OperatorPlusCMyStringCharPtr)
@@ -295,6 +327,66 @@ TEST(CMyString, OperatorPlusCMyStringCharPtr)
 	CMyString result = str + charPtr;
 	EXPECT_EQ(result.GetLength(), 11);
 	EXPECT_STREQ(result.GetStringData(), "Hello World");
+	EXPECT_GE(result.GetCapacity(), 12);
+}
+
+TEST(CMyString, PlusEqualsDoublingCapacity)
+{
+	CMyString str1("Hello");
+	size_t initialCapacity = str1.GetCapacity();
+	CMyString str2(" World!");
+
+	str1 += str2;
+
+	EXPECT_EQ(str1.GetLength(), 12);
+	EXPECT_STREQ(str1.GetStringData(), "Hello World!");
+	EXPECT_GE(str1.GetCapacity(), initialCapacity * 2);
+}
+
+TEST(CMyString, PlusDoublingCapacity)
+{
+	CMyString str1("Hello");
+	size_t initialCapacity = str1.GetCapacity();
+	CMyString str2(" World!");
+
+	CMyString result = str1 + str2;
+
+	EXPECT_EQ(result.GetLength(), 12);
+	EXPECT_STREQ(result.GetStringData(), "Hello World!");
+	EXPECT_GE(result.GetCapacity(), initialCapacity * 2);
+}
+
+TEST(CMyString, PlusEqualsDoublingCapacityWithMultipleConcatenations)
+{
+	CMyString str1("A");
+	size_t initialCapacity = str1.GetCapacity();
+	CMyString str2("B");
+
+	for (int i = 0; i < 20; ++i)
+	{
+		str1 += str2;
+	}
+
+	EXPECT_EQ(str1.GetLength(), 21);
+	EXPECT_STREQ(str1.GetStringData(), "ABBBBBBBBBBBBBBBBBBBB");
+	EXPECT_GE(str1.GetCapacity(), initialCapacity * 2);
+}
+
+TEST(CMyString, PlusDoublingCapacityWithMultipleConcatenations)
+{
+	CMyString str1("A");
+	size_t initialCapacity = str1.GetCapacity();
+	CMyString str2("B");
+	CMyString result = str1;
+
+	for (int i = 0; i < 20; ++i)
+	{
+		result = result + str2;
+	}
+
+	EXPECT_EQ(result.GetLength(), 21);
+	EXPECT_STREQ(result.GetStringData(), "ABBBBBBBBBBBBBBBBBBBB");
+	EXPECT_GE(result.GetCapacity(), initialCapacity * 2);
 }
 
 TEST(CMyString, EqualityOperatorSameStrings)

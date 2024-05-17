@@ -15,6 +15,7 @@ public:
 	~CMyString();
 
 	[[nodiscard]] size_t GetLength() const;
+	[[nodiscard]] size_t GetCapacity() const;
 	[[nodiscard]] const char* GetStringData() const;
 	[[nodiscard]] CMyString SubString(size_t start, size_t length = SIZE_MAX) const;
 	void Clear();
@@ -45,6 +46,7 @@ private:
 	constexpr static const char INPUT_STRING_SEPARATOR = ' ';
 	static char EMPTY_STRING[1];
 	size_t m_length;
+	size_t m_capacity;
 	char* m_pData;
 };
 

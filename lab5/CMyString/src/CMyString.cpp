@@ -6,8 +6,9 @@ char CMyString::EMPTY_STRING[1] = { '\0' };
 
 CMyString::CMyString(const char* pString, size_t length)
 	: m_length(length)
+	, m_capacity(length + 1)
 {
-	m_pData = new char[m_length + 1];
+	m_pData = new char[m_capacity];
 	strncpy(m_pData, pString, length);
 	m_pData[length] = END_OF_STRING;
 }
@@ -30,9 +31,11 @@ CMyString::CMyString(const CMyString& other)
 CMyString::CMyString(CMyString&& other) noexcept
 	: m_pData(other.m_pData)
 	, m_length(other.m_length)
+	, m_capacity(other.m_capacity)
 {
 	other.m_pData = EMPTY_STRING;
 	other.m_length = 0;
+	other.m_capacity = 1;
 }
 
 CMyString::CMyString(const std::string& stlString)
@@ -51,6 +54,11 @@ CMyString::~CMyString()
 size_t CMyString::GetLength() const
 {
 	return m_length;
+}
+
+size_t CMyString::GetCapacity() const
+{
+	return m_capacity;
 }
 
 const char* CMyString::GetStringData() const
@@ -79,15 +87,17 @@ void CMyString::Clear()
 	m_pData = new char[1];
 	m_pData[0] = END_OF_STRING;
 	m_length = 0;
+	m_capacity = 1;
 }
 
 CMyString& CMyString::operator=(const CMyString& other)
 {
 	if (std::addressof(other) != this)
 	{
-		CMyString tempCopy(other);
-		std::swap(m_pData, tempCopy.m_pData);
-		std::swap(m_length, tempCopy.m_length);
+		CMyString temp(other);
+		std::swap(m_pData, temp.m_pData);
+		std::swap(m_length, temp.m_length);
+		std::swap(m_capacity, temp.m_capacity);
 	}
 
 	return *this;
@@ -99,10 +109,12 @@ CMyString& CMyString::operator=(CMyString&& other) noexcept
 	{
 		delete[] m_pData;
 		m_length = 0;
+		m_capacity = 1;
 		m_pData = EMPTY_STRING;
 
 		std::swap(m_pData, other.m_pData);
 		std::swap(m_length, other.m_length);
+		std::swap(m_capacity, other.m_capacity);
 	}
 
 	return *this;
@@ -110,18 +122,25 @@ CMyString& CMyString::operator=(CMyString&& other) noexcept
 
 CMyString& CMyString::operator+=(CMyString const& other)
 {
-	size_t newCMyStringLength = m_length + other.m_length;
+	if (std::addressof(other) == this)
+	{
+		CMyString temp(*this);
+		return *this += temp;
+	}
 
-	char* newCMyStringData = new char[newCMyStringLength + 1];
-	memcpy(newCMyStringData, m_pData, m_length);
-	memcpy(newCMyStringData + m_length, other.m_pData, other.m_length);
-
-	newCMyStringData[newCMyStringLength] = CMyString::END_OF_STRING;
-
-	delete[] m_pData;
-	m_pData = newCMyStringData;
-	m_length = newCMyStringLength;
-
+	if (m_length + other.m_length + 1 > m_capacity)
+	{
+		m_capacity = (m_length + other.m_length + 1) * 2;
+		char* newData = new char[m_capacity];
+		std::memcpy(newData, m_pData, m_length);
+		if (m_pData != EMPTY_STRING)
+		{
+			delete[] m_pData;
+		}
+		m_pData = newData;
+	}
+	std::memcpy(m_pData + m_length, other.m_pData, other.m_length + 1);
+	m_length += other.m_length;
 	return *this;
 }
 
@@ -147,20 +166,16 @@ char& CMyString::operator[](size_t index)
 
 CMyString operator+(CMyString const& myString1, CMyString const& myString2)
 {
-	size_t newCMyStringLength = myString1.GetLength() + myString2.GetLength();
-	CMyString newCMyString;
+	CMyString result;
+	result.m_length = myString1.m_length + myString2.m_length;
+	result.m_capacity = (result.m_length + 1) * 2;
+	result.m_pData = new char[result.m_capacity];
 
-	char* newCMyStringData = new char[newCMyStringLength + 1];
-	memcpy(newCMyStringData, myString1.GetStringData(), myString1.GetLength());
-	memcpy(newCMyStringData + myString1.GetLength(),
-		myString2.GetStringData(),
-		myString2.GetLength());
-	newCMyStringData[newCMyStringLength] = CMyString::END_OF_STRING;
+	std::memcpy(result.m_pData, myString1.m_pData, myString1.m_length);
+	std::memcpy(result.m_pData + myString1.m_length, myString2.m_pData, myString2.m_length);
+	result.m_pData[result.m_length] = CMyString::END_OF_STRING;
 
-	newCMyString = CMyString(newCMyStringData, newCMyStringLength);
-	delete[] newCMyStringData;
-
-	return newCMyString;
+	return result;
 }
 
 CMyString operator+(const std::string& string1, const CMyString& myString2)
@@ -279,6 +294,7 @@ std::istream& operator>>(std::istream& stream, CMyString& myString)
 	delete[] myString.m_pData;
 	myString.m_length = resultLength;
 	myString.m_pData = resultData;
+	myString.m_capacity = resultDataSize;
 
 	return stream;
 }
