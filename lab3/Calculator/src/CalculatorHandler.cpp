@@ -145,7 +145,7 @@ void CalculatorHandler::HandleLetCommand(const std::string& commandLine)
 	try
 	{
 		double value = std::stod(valueString);
-		m_calculator.InitVariable(Trim(identifier), value); // упростить
+		m_calculator.InitVariable(Trim(identifier), value);
 		m_calculator.InitVariable(Trim(identifier), Trim(valueString));
 	}
 	catch (const std::exception& e)

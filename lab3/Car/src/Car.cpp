@@ -12,14 +12,6 @@ const int MAX_FOURTH_GEAR_SPEED = 90;
 const int MIN_FIFTH_GEAR_SPEED = 50;
 const int MAX_FIFTH_GEAR_SPEED = 150;
 
-Car::Car()
-	: m_isTurnedOn(false)
-	, m_direction(Direction::STAY)
-	, m_gear(0)
-	, m_speed(0)
-{
-}
-
 bool Car::TurnOnEngine()
 {
 	m_isTurnedOn = true;
@@ -89,6 +81,11 @@ bool Car::SetGear(int gear)
 bool Car::SetSpeed(int speed)
 {
 	if (!m_isTurnedOn)
+	{
+		return false;
+	}
+
+	if (speed < MIN_SPEED)
 	{
 		return false;
 	}

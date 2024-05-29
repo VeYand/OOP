@@ -1,121 +1,77 @@
 #include "../include/BorTrieUtils.h"
-#include <cstring>
 
-const int ROOT = 0;
-const char CHAR_ROOT = '~';
+BohrTrie::BohrTrie() {
+	m_bohr.emplace_back();
+}
 
-int GetAutoMove(int vertex, char symbol, std::vector<BohrVertex>& bohr)
-{
-	int nextVertex = bohr[vertex].nextVertex[static_cast<unsigned char>(symbol)];
-	int suffixFromLastTransition = bohr[vertex].autoMove[static_cast<unsigned char>(symbol)];
+int BohrTrie::GetAutoMove(int vertex, char symbol) {
+	int nextVertex = m_bohr[vertex].nextVertex[static_cast<unsigned char>(symbol)];
+	int suffixFromLastTransition = m_bohr[vertex].autoMove;
 
 	if (suffixFromLastTransition != NOT_USED)
-	{
 		return suffixFromLastTransition;
-	}
 
 	if (nextVertex != NOT_USED)
-	{
 		return nextVertex;
-	}
 
-	if (vertex == ROOT)
-	{
-		return ROOT;
-	}
+	if (vertex == 0)
+		return 0;
 
-	return GetAutoMove(GetSuffixLink(vertex, bohr), symbol, bohr);
+	return GetAutoMove(GetSuffixLink(vertex), symbol);
 }
 
-int GetSuffixLink(int vertex, std::vector<BohrVertex>& bohr)
-{
-	int suffixLink = bohr[vertex].suffixLink;
-	int parent = bohr[vertex].parent;
+int BohrTrie::GetSuffixLink(int vertex) {
+	int& suffixLink = m_bohr[vertex].suffixLink;
+	int parent = m_bohr[vertex].parent;
 
 	if (suffixLink != NOT_USED)
-	{
 		return suffixLink;
-	}
 
-	if (vertex == ROOT || parent == ROOT)
-	{
-		return ROOT;
-	}
+	if (vertex == 0 || parent == 0)
+		return 0;
 
-	return GetAutoMove(GetSuffixLink(parent, bohr), bohr[vertex].symbol, bohr);
+	return suffixLink = GetAutoMove(GetSuffixLink(parent), m_bohr[vertex].symbol);
 }
 
-int GetGoodSuffixLink(int vertex, std::vector<BohrVertex>& bohr)
-{
-	int suffixGoofLink = bohr[vertex].suffixGoodLink;
+int BohrTrie::GetGoodSuffixLink(int vertex) {
+	int& suffixGoodLink = m_bohr[vertex].suffixGoodLink;
 
-	if (suffixGoofLink != NOT_USED) {
-		return suffixGoofLink;
-	}
+	if (suffixGoodLink != NOT_USED)
+		return suffixGoodLink;
 
-	int suffixLink = GetSuffixLink(vertex, bohr);
+	int suffixLink = GetSuffixLink(vertex);
 
-	if (suffixLink == ROOT)
-	{
-		return ROOT;
-	}
+	if (suffixLink == 0)
+		return 0;
 
-	if (bohr[suffixLink].isTerminal) {
-		return suffixLink;
-	}
+	if (m_bohr[suffixLink].isTerminal)
+		return suffixGoodLink = suffixLink;
 
-	return GetGoodSuffixLink(suffixLink, bohr);
+	return suffixGoodLink = GetGoodSuffixLink(suffixLink);
 }
 
-void Check(int vertex, int startStr, std::vector<BohrVertex>& bohr, std::map<int, std::string>& substrings)
-{
-	for (int u = vertex; u != 0; u = GetGoodSuffixLink(u, bohr))
-	{
-		std::string& stringToReplace = *(bohr[u].ptr);
-		if (bohr[u].isTerminal)
-		{
+void BohrTrie::Check(int vertex, int startStr, std::map<int, std::string>& substrings) {
+	for (int u = vertex; u != 0; u = GetGoodSuffixLink(u)) {
+		std::string& stringToReplace = *(m_bohr[u].ptr);
+		if (m_bohr[u].isTerminal)
 			substrings[static_cast<int>(startStr - stringToReplace.length())] = stringToReplace;
-		}
 	}
 }
 
-BohrVertex MakeBohrVertex(int parent, char symbol)
-{
-	BohrVertex vertex{};
-	memset(reinterpret_cast<void*>(vertex.nextVertex), 255, sizeof(vertex.nextVertex));
-	memset(reinterpret_cast<void*>(vertex.autoMove), 255, sizeof(vertex.autoMove));
-	vertex.isTerminal = false;
-	vertex.suffixLink = NOT_USED;
-	vertex.suffixGoodLink = NOT_USED;
-	vertex.parent = parent;
-	vertex.symbol = symbol;
-	return vertex;
-}
-
-void AddStringToBohr(const std::string* ptr, std::vector<BohrVertex>& bohr)
-{
+void BohrTrie::AddString(const std::string& str) {
 	int num = 0;
-	std::string str = *ptr;
-	for (char ch : str)
-	{
-		if (int(bohr[num].nextVertex[static_cast<unsigned char>(ch)]) == NOT_USED)
-		{
-			bohr.push_back(MakeBohrVertex(num, ch));
-			bohr[num].nextVertex[static_cast<unsigned char>(ch)] = int(bohr.size() - 1);
+	for (char ch : str) {
+		if (m_bohr[num].nextVertex[ch] == NOT_USED) {
+			m_bohr.emplace_back(num, ch);
+			m_bohr[num].nextVertex[ch] = static_cast<int>(m_bohr.size()) - 1;
 		}
-		num = bohr[num].nextVertex[static_cast<unsigned char>(ch)];
+		num = m_bohr[num].nextVertex[ch];
 	}
-	bohr[num].isTerminal = true;
-	bohr[num].ptr = const_cast<std::string*>(ptr);
+	m_bohr[num].isTerminal = true;
+	m_bohr[num].ptr = const_cast<std::string*>(&str);
 }
 
-std::vector<BohrVertex> CreateBohr(const Replacement& params)
-{
-	std::vector<BohrVertex> bohr;
-	bohr.push_back(MakeBohrVertex(-1, CHAR_ROOT));
-	for (const auto& item : params)
-	{
-		AddStringToBohr(&(item.first), bohr);
-	}
-	return bohr;
+void BohrTrie::Build(const std::vector<std::string>& strings) {
+	for (const auto& str : strings)
+		AddString(str);
 }

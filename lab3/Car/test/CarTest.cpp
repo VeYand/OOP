@@ -401,6 +401,16 @@ TEST(CarTest, ChangeSpeedOnNeutralGear)
 	ASSERT_TRUE(car.SetSpeed(19));
 }
 
+TEST(CarTest, NegativeSpeed)
+{
+	Car car;
+	car.TurnOnEngine();
+
+	ASSERT_FALSE(car.SetSpeed(-10));
+	ASSERT_TRUE(car.SetGear(1));
+	ASSERT_FALSE(car.SetSpeed(-10));
+}
+
 GTEST_API_ int main(int argc, char** argv)
 {
 	std::cout << "Running tests" << std::endl;

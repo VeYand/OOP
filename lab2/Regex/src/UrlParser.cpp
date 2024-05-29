@@ -93,7 +93,11 @@ bool ParseURLPort(const std::string& portStr, Protocol& protocol, int& port)
 
 bool ParseURL(const std::string& url, Protocol& protocol, int& port, std::string& host, std::string& document)
 {
-	std::regex urlRegex(R"((https?|ftp)://([^:/]+)(?::(\d+))?(?:/(.*))?)", std::regex::icase);
+	std::regex urlRegex(R"(
+		(https?)://([^:/]+)(?::(\d+))?(?:/(.*))?
+		(https?)://([^:/]+)(?::(\d+))(?:/(.*))?
+
+		)", std::regex::icase);
 	std::smatch match;
 
 	Protocol parsedProtocol;

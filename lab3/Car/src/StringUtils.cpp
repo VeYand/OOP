@@ -31,17 +31,3 @@ void Lower(std::string& str)
 {
 	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }
-
-int StringToInt(const std::string& str)
-{
-	int number;
-	try
-	{
-		number = std::stoi(str);
-	}
-	catch (const std::exception& e)
-	{
-		throw std::invalid_argument("Invalid number");
-	}
-	return number;
-}

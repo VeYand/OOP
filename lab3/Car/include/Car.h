@@ -12,7 +12,6 @@ enum class Direction
 class Car
 {
 public:
-	Car();
 	bool TurnOnEngine();
 	bool TurnOffEngine();
 	bool SetGear(int gear);
@@ -24,10 +23,10 @@ public:
 
 private:
 	void SetDirection();
-	Direction m_direction;
-	bool m_isTurnedOn;
-	int m_gear;
-	int m_speed;
+	Direction m_direction = Direction::STAY;
+	bool m_isTurnedOn = false;
+	int m_gear = 0;
+	int m_speed = 0;
 };
 
 #endif // CAR_SRC_CAR_H

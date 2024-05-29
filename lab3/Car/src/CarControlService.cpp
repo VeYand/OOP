@@ -85,7 +85,7 @@ bool HandleSetGearCommand(Car& car)
 	}
 	try
 	{
-		gear = StringToInt(gearLine);
+		gear = std::stoi(gearLine);
 	}
 	catch (const std::exception&)
 	{
@@ -116,7 +116,7 @@ bool HandleSetSpeedCommand(Car& car)
 
 	try
 	{
-		speed = StringToInt(speedLine);
+		speed = std::stoi(speedLine);
 	}
 	catch (const std::exception&)
 	{

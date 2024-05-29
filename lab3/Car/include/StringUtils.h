@@ -8,6 +8,4 @@ void Trim(std::string& str);
 
 void Lower(std::string& str);
 
-int StringToInt(const std::string& str);
-
 #endif // CAR_SRC_STRINGUTILS_H

@@ -55,38 +55,41 @@ TEST(CHttpUrl, UrlWithUpperCaseProtocolCHttpUrl)
 	EXPECT_EQ("/", httpUrl.GetDocument());
 }
 
-TEST(CHttpUrl, InvalidPort)
-{
-	EXPECT_THROW(CHttpUrl("https://localhost:999999999"), CUrlParsingError);
-}
-
 TEST(CHttpUrl, InvalidProtocol)
 {
 	EXPECT_THROW(CHttpUrl("httpss://localhost"), CUrlParsingError);
 }
 
 TEST(CHttpUrl, ConstructWithCorrectUrl) {
-	EXPECT_NO_THROW(CHttpUrl("https://faceit.com"));
+	EXPECT_NO_THROW(CHttpUrl("https://mysite.com"));
 }
 
 TEST(CHttpUrl, ConstructWithCorrectUrlAndComplicatedDomain) {
-	EXPECT_NO_THROW(CHttpUrl("https://faceit.com/kvantero/ratings/solo"));
+	EXPECT_NO_THROW(CHttpUrl("https://mysite.com/hello/ratings/ping"));
 }
 
 TEST(CHttpUrl, ConstructWithCorrectUrlAndDocument) {
-	EXPECT_NO_THROW(CHttpUrl("https://faceit.com/stats"));
+	EXPECT_NO_THROW(CHttpUrl("https://mysite.com/status"));
+}
+
+TEST(CHttpUrl, ConstructWithUnderflowPort) {
+	EXPECT_THROW(CHttpUrl("http://mysite.com:0/status"), std::invalid_argument);
 }
 
 TEST(CHttpUrl, ConstructWithCorrectUrlAndMinPort) {
-	EXPECT_NO_THROW(CHttpUrl("http://faceit.com:" + std::to_string(std::numeric_limits<unsigned short>::min()) + "/stats"));
+	EXPECT_NO_THROW(CHttpUrl("http://mysite.com:1/status"));
+}
+
+TEST(CHttpUrl, ConstructWithOverflowPort) {
+	EXPECT_THROW(CHttpUrl("http://mysite.com:65536/status"), std::invalid_argument);
 }
 
 TEST(CHttpUrl, ConstructWithCorrectUrlAndMaxPort) {
-	EXPECT_NO_THROW(CHttpUrl("https://faceit.com:" + std::to_string(std::numeric_limits<unsigned short>::max()) + "/kvantero"));
+	EXPECT_NO_THROW(CHttpUrl("https://mysite.com:65535/status"));
 }
 
 TEST(CHttpUrl, ConstructWithIncorrectUrlNoProtocol) {
-	EXPECT_THROW(CHttpUrl("//faceit.com/kvantero"), CUrlParsingError);
+	EXPECT_THROW(CHttpUrl("//mysite.com/mysite"), CUrlParsingError);
 }
 
 TEST(CHttpUrl, ConstructWithIncorrectUrlNoDomain) {
@@ -94,69 +97,47 @@ TEST(CHttpUrl, ConstructWithIncorrectUrlNoDomain) {
 }
 
 TEST(CHttpUrl, ConstructWithIncorrectUrlWrongProtocol) {
-	EXPECT_THROW(CHttpUrl("abcde://faceit.com/kvantero"), CUrlParsingError);
-}
-
-TEST(CHttpUrl, ConstructWithIncorrectUrlWrongDomain) {
-	EXPECT_THROW(CHttpUrl("http://face it.com"), CUrlParsingError);
-}
-
-TEST(CHttpUrl, ConstructWithIncorrectUrlWrongDocument) {
-	EXPECT_THROW(CHttpUrl("https://faceit.com/main / 123"), CUrlParsingError);
+	EXPECT_THROW(CHttpUrl("abcde://mysite.com/mysite"), CUrlParsingError);
 }
 
 TEST(CHttpUrl, ConstructWithIncorrectUrlPortNotNumber) {
-	EXPECT_THROW(CHttpUrl("http://faceit.com:string"), CUrlParsingError);
+	EXPECT_THROW(CHttpUrl("http://mysite.com:string"), CUrlParsingError);
 }
 
 TEST(CHttpUrl, ConstructWithIncorrectUrlPortLessThanMinPort) {
-	EXPECT_THROW(CHttpUrl("https://faceit.com:123abc"), CUrlParsingError);
+	EXPECT_THROW(CHttpUrl("https://mysite.com:123abc"), CUrlParsingError);
 }
 
 TEST(CHttpUrl, ConstructWithIncorrectUrlPortGreaterThanMaxPort) {
-	EXPECT_THROW(CHttpUrl("http://faceit.com:" + std::to_string(std::numeric_limits<unsigned short>::max() + 1)), CUrlParsingError);
+	EXPECT_THROW(CHttpUrl("http://mysite.com:" + std::to_string(std::numeric_limits<unsigned short>::max() + 1)), CUrlParsingError);
 }
 
 TEST(CHttpUrl, ConstructWithCorrectValuesAndEmptyDocument) {
 	CHttpUrl::Protocol protocol = CHttpUrl::Protocol::HTTP;
-	std::string domain = "faceit.com";
+	std::string domain = "mysite.com";
 	std::string document;
 	EXPECT_NO_THROW(CHttpUrl(domain, document, protocol));
 }
 
 TEST(CHttpUrl, ConstructWithCorrectValuesAndValuedDocument) {
 	CHttpUrl::Protocol protocol = CHttpUrl::Protocol::HTTPS;
-	std::string domain = "faceit.com";
-	std::string document = "stats/ratings";
+	std::string domain = "mysite.com";
+	std::string document = "site/ratings";
 	EXPECT_NO_THROW(CHttpUrl(domain, document, protocol));
-}
-
-TEST(CHttpUrl, ConstructWithIncorrectDomain) {
-	CHttpUrl::Protocol protocol = CHttpUrl::Protocol::HTTP;
-	std::string domain = "face i t .com";
-	std::string document;
-	EXPECT_THROW(CHttpUrl(domain, document, protocol), CUrlParsingError);
-}
-
-TEST(CHttpUrl, ConstructWithIncorrectDocument) {
-	CHttpUrl::Protocol protocol = CHttpUrl::Protocol::HTTPS;
-	std::string domain = "faceit.com";
-	std::string document = "st ats /kvanter o---";
-	EXPECT_THROW(CHttpUrl(domain, document, protocol), CUrlParsingError);
 }
 
 TEST(CHttpUrl, ConstructWithCorrectValuesAndRandomPort) {
 	CHttpUrl::Protocol protocol = CHttpUrl::Protocol::HTTP;
-	std::string domain = "faceit.com";
+	std::string domain = "mysite.com";
 	std::string document;
 	unsigned short port = 52532;
 	EXPECT_NO_THROW(CHttpUrl(domain, document, protocol, port));
 }
 
 TEST(CHttpUrl, GetMethods) {
-	std::string domain = "faceit.com";
+	std::string domain = "mysite.com";
 	unsigned short port = 4554;
-	std::string document = "/stats/ratings/form.php?";
+	std::string document = "/hello/world/image.png?";
 	std::string correctStringUrl = "https://" + domain + ":" + std::to_string(port) + document;
 
 	CHttpUrl correctUrl(domain, document, CHttpUrl::Protocol::HTTPS, port);

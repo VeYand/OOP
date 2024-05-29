@@ -46,7 +46,7 @@ unsigned short CHttpUrl::GetDefaultPort(CHttpUrl::Protocol protocol)
 	case Protocol::HTTPS:
 		return HTTPS_PROTOCOL_DEFAULT_PORT;
 	default:
-		throw CUrlParsingError("Invalid url protocol");
+		throw std::invalid_argument("Invalid url protocol");
 	}
 }
 
@@ -82,7 +82,7 @@ void CHttpUrl::CheckUrlHost(const std::string& hostStr)
 {
 	if (hostStr.empty())
 	{
-		throw CUrlParsingError("Invalid url host");
+		throw std::invalid_argument("Invalid url host");
 	}
 }
 
@@ -97,14 +97,14 @@ unsigned short CHttpUrl::ParseURLPort(const std::string& portStr, CHttpUrl::Prot
 	try
 	{
 		portNum = std::stoi(portStr);
-		if (portNum < 0 || portNum > std::numeric_limits<unsigned short>::max())
+		if (portNum < MIN_PORT_NUM || portNum > MAX_PORT_NUM)
 		{
 			throw CUrlParsingError("Invalid url port");
 		}
 
 		return static_cast<unsigned short>(portNum);
 	}
-	catch (const std::out_of_range& e)
+	catch (...)
 	{
 		throw CUrlParsingError("Invalid url port");
 	}
@@ -127,7 +127,14 @@ CHttpUrl::CHttpUrl(std::string const& url)
 		throw CUrlParsingError("Invalid url");
 	}
 
-	CheckUrlHost(match[2]);
+	try
+	{
+		CheckUrlHost(match[2]);
+	}
+	catch (const std::invalid_argument&)
+	{
+		throw CUrlParsingError("Invalid url host");
+	}
 
 	auto protocol = StringToProtocol(match[1]);
 	auto host = match[2];

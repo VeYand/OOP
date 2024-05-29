@@ -7,6 +7,7 @@ TEST(CalculatorTest, DeclareVariable)
 	calculator.DeclareVariable("x");
 	auto vars = calculator.GetVars();
 	EXPECT_TRUE(vars.find("x") != vars.end());
+	EXPECT_TRUE(std::isnan(calculator.CalculateValue("x")));
 }
 
 TEST(CalculatorTest, DeclareAndInitVariableWithValue)

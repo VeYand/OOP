@@ -36,6 +36,7 @@ public:
 	CDate(unsigned day, Month month, unsigned year);
 	explicit CDate(unsigned timestamp);
 	CDate();
+
 	[[nodiscard]] unsigned GetDay() const;
 	[[nodiscard]] Month GetMonth() const;
 	[[nodiscard]] unsigned GetYear() const;
@@ -67,6 +68,16 @@ public:
 	friend std::istream& operator>>(std::istream& is, CDate& date);
 
 private:
+	struct DateInfo
+	{
+		unsigned day;
+		Month month;
+		unsigned year;
+	};
+	constexpr static const int MONTHS_OFFSET[2][12] = {
+		{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 },
+		{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 },
+	};
 	constexpr static const unsigned MAX_TIMESTAMP = 2932896;
 	constexpr static const unsigned DAYS_IN_YEAR = 365;
 	constexpr static const unsigned EPOCH_YEAR = 1970;
@@ -74,6 +85,7 @@ private:
 	constexpr static const unsigned DAYS_IN_WEEK = 7;
 	constexpr static const char DATE_DIVIDER = '.';
 	unsigned m_timestamp;
+	[[nodiscard]] DateInfo GetCalendarDays() const;
 	static bool IsLeapYear(unsigned year);
 	static unsigned DaysInMonth(Month month, unsigned year);
 	static unsigned CalculateDaysSinceEpoch(unsigned day, Month month, unsigned year);

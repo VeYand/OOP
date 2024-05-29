@@ -1,4 +1,3 @@
-#include "ExpandTemplate.h"
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -9,25 +8,35 @@
 #define BORTRIEUTILS_SRC_BORTRIEUTILS_H
 
 const int NOT_USED = -1;
+const int ALPHABET_SIZE = 256;
 
-struct BohrVertex
-{
-	int nextVertex[255]{NOT_USED};
-	std::string *ptr; // указатель на строку в params
-	int parent; // родитель
-	int autoMove[255]{NOT_USED}; // показывает ссылку на сына от последнего перехода
-	int suffixLink;// суффиксальная ссылка
-	int suffixGoodLink; // "хорошая" суффиксальная ссылка
-	char symbol; // символ на ребре от родителя
+struct BohrVertex {
+	std::vector<int> nextVertex;
+	std::string* ptr;
+	int parent;
+	int autoMove;
+	int suffixLink;
+	int suffixGoodLink;
+	char symbol;
 	bool isTerminal;
+
+	explicit BohrVertex(int parent = -1, char symbol = '\0')
+		: nextVertex(ALPHABET_SIZE, NOT_USED), ptr(nullptr),
+		parent(parent), autoMove(NOT_USED),
+		suffixLink(NOT_USED), suffixGoodLink(NOT_USED),
+		symbol(symbol), isTerminal(false) {}
 };
 
-std::vector<BohrVertex> CreateBohr(const std::map <std::string, std::string>& params);
-
-int GetSuffixLink(int vertex, std::vector<BohrVertex>& bohr);
-
-int GetAutoMove(int vertex, char symbol, std::vector<BohrVertex>& bohr);
-
-void Check(int vertex, int startStr, std::vector<BohrVertex>& bohr, std::map<int, std::string>& substrings);
-
+class BohrTrie {
+private:
+	std::vector<BohrVertex> m_bohr;
+public:
+	BohrTrie();
+	void AddString(const std::string& str);
+	void Build(const std::vector<std::string>& strings);
+	int GetAutoMove(int vertex, char symbol);
+	int GetSuffixLink(int vertex);
+	int GetGoodSuffixLink(int vertex);
+	void Check(int vertex, int startStr, std::map<int, std::string>& substrings);
+};
 #endif // BORTRIEUTILS_SRC_BORTRIEUTILS_H

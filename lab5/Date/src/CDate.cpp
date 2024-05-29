@@ -45,53 +45,17 @@ CDate::CDate()
 
 unsigned CDate::GetDay() const
 {
-	unsigned days = m_timestamp;
-
-	unsigned year = EPOCH_YEAR;
-	while (days >= DAYS_IN_YEAR + IsLeapYear(year)) // todo без циклов
-	{
-		days -= DAYS_IN_YEAR + IsLeapYear(year);
-		year++;
-	}
-
-	unsigned month = 1;
-	while (days >= DaysInMonth(static_cast<Month>(month), year)) // todo без циклов
-	{
-		days -= DaysInMonth(static_cast<Month>(month), year);
-		month++;
-	}
-
-	return days + 1;
+	return GetCalendarDays().day;
 }
 
 CDate::Month CDate::GetMonth() const
 {
-	unsigned days = m_timestamp;
-	unsigned year = EPOCH_YEAR;
-	while (days >= DAYS_IN_YEAR + IsLeapYear(year)) // todo без циклов
-	{
-		days -= DAYS_IN_YEAR + IsLeapYear(year);
-		year++;
-	}
-	unsigned month = 1;
-	while (days >= DaysInMonth(static_cast<Month>(month), year)) // todo без циклов
-	{
-		days -= DaysInMonth(static_cast<Month>(month), year);
-		month++;
-	}
-	return static_cast<Month>(month);
+	return GetCalendarDays().month;
 }
 
 unsigned CDate::GetYear() const
 {
-	unsigned days = m_timestamp;
-	unsigned year = EPOCH_YEAR;
-	while (days >= DAYS_IN_YEAR + IsLeapYear(year)) // todo без циклов
-	{
-		days -= DAYS_IN_YEAR + IsLeapYear(year);
-		year++;
-	}
-	return year;
+	return GetCalendarDays().year;
 }
 
 CDate::WeekDay CDate::GetWeekDay() const
@@ -102,6 +66,41 @@ CDate::WeekDay CDate::GetWeekDay() const
 bool CDate::IsLeapYear(unsigned year)
 {
 	return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
+CDate::DateInfo CDate::GetCalendarDays() const
+{
+	unsigned year = (EPOCH_YEAR + 4 * m_timestamp / (DAYS_IN_YEAR * 4 + 1)) + 1;
+
+	int daysGap = static_cast<int>(m_timestamp - CalculateDaysSinceEpoch(1, Month::JANUARY, year) + 1);
+	if (daysGap <= 0)
+	{
+		year--;
+		daysGap += static_cast<int>(DAYS_IN_YEAR) + IsLeapYear(year);
+	}
+
+	int monthIndex;
+	unsigned d{};
+
+	for (monthIndex = 0; monthIndex < 12 && daysGap > MONTHS_OFFSET[IsLeapYear(year)][monthIndex]; monthIndex++)
+	{
+		d = daysGap - MONTHS_OFFSET[IsLeapYear(year)][monthIndex];
+	}
+
+	return { d, static_cast<Month>(monthIndex), year };
+}
+
+unsigned CDate::CalculateDaysSinceEpoch(unsigned day, Month month, unsigned year)
+{
+	unsigned yearGap = year - EPOCH_YEAR;
+	unsigned daysInYearGap = yearGap * DAYS_IN_YEAR + yearGap / 4 - yearGap / 100 + yearGap / 400;
+
+	if (IsLeapYear(year - 1))
+	{
+		daysInYearGap++;
+	}
+
+	return daysInYearGap + MONTHS_OFFSET[IsLeapYear(year)][static_cast<unsigned>(month) - 1] + (day - 1);
 }
 
 unsigned CDate::DaysInMonth(Month month, unsigned year)
@@ -126,18 +125,6 @@ unsigned CDate::DaysInMonth(Month month, unsigned year)
 	default:
 		return 0;
 	}
-}
-
-unsigned CDate::CalculateDaysSinceEpoch(unsigned day, Month month, unsigned year)
-{
-	unsigned days = day - 1;
-	for (unsigned y = EPOCH_YEAR; y < year; ++y) // todo без циклов
-		days += DAYS_IN_YEAR + IsLeapYear(y);
-
-	for (unsigned m = 1; m < static_cast<unsigned>(month); ++m) // todo без циклов
-		days += DaysInMonth(static_cast<Month>(m), year);
-
-	return days;
 }
 
 CDate& CDate::operator++()

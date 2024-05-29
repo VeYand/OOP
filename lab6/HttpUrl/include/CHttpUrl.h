@@ -43,6 +43,8 @@ private:
 	constexpr static const std::string HTTPS_PROTOCOL_STRING = "https";
 	constexpr static const int HTTP_PROTOCOL_DEFAULT_PORT = 80;
 	constexpr static const int HTTPS_PROTOCOL_DEFAULT_PORT = 443;
+	constexpr static const unsigned short MAX_PORT_NUM = 65535;
+	constexpr static const unsigned short MIN_PORT_NUM = 1;
 	static const std::string PROTOCOL_REGEXP;
 	static const std::string HOST_REGEXP;
 	static const std::string PORT_REGEXP;
