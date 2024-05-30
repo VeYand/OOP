@@ -104,11 +104,7 @@ TEST(CMyArrayTest, AssignmentOperatorSelfAssigment)
 	CMyArray<int> array;
 	array.Add(1);
 	array.Add(2);
-	CMyArray<int> assignArray;
-	assignArray = array;
-	EXPECT_EQ(assignArray.Size(), 2);
-	EXPECT_EQ(assignArray[0], 1);
-	EXPECT_EQ(assignArray[1], 2);
+	array = array;
 	EXPECT_EQ(array.Size(), 2);
 	EXPECT_EQ(array[0], 1);
 	EXPECT_EQ(array[1], 2);
